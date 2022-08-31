@@ -16,16 +16,10 @@ namespace Appointment_Manager
         private Appointments Aptmnts;
         private Search Search;
         //  Strings for database.
-        //  local database.
         private static readonly string server = "localhost";
         private static readonly string database = "clientschedule";
         private static readonly string uid = "root";
         private static readonly string pass = "student";
-        //  task database.
-        //private static readonly string server = "localhost";
-        //private static readonly string database = "client_schedule";
-        //private static readonly string uid = "sqlUser";
-        //private static readonly string pass = "Passw0rd!";
         //  Connection string.
         private static readonly string connectionString = "server=" + Main.server + ";" + "userid=" + Main.uid + ";" +
             "password=" + Main.pass + ";" + "database=" + Main.database + ";";
@@ -55,8 +49,8 @@ namespace Appointment_Manager
             Countries = new BindingList<Country>();
             Customers = new BindingList<Customer>();
             Users = new BindingList<User>();
-            //  
-            //  Load appointments for initial view.
+            //
+            //  Load appointments into collection list.
             MySqlConnection connection = ConnectToDB();
             connection.Open();
             String sqlString = "SELECT * FROM appointment";
@@ -67,6 +61,7 @@ namespace Appointment_Manager
                 NewAppointment(rdr);
             }
             rdr.Close();
+            //
             //  Fill collection of users for creating appointments.
             sqlString = "SELECT * FROM user";
             cmd = new MySqlCommand(sqlString, connection);
@@ -77,8 +72,10 @@ namespace Appointment_Manager
             }
             rdr.Close();
             connection.Close();
+            //
             //  Fill collections for customers
             LoadCustomers();
+            //
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -91,7 +88,6 @@ namespace Appointment_Manager
                 //  Set datasource and view for Main's dataGridView1;
                 UpdateAppointments();
             }
-
         }
 
         private MySqlConnection ConnectToDB()
@@ -261,7 +257,7 @@ namespace Appointment_Manager
             );
             Countries.Add(temp);
         }
-        
+
         private void NewCountry(int countryId, string country, DateTime date, string user, DateTime date1,string user1)
         {
             Country temp = new Country(countryId,country,date,user,date1,user1);
@@ -283,7 +279,7 @@ namespace Appointment_Manager
             );
             Customers.Add(temp);
         }
-        
+
         private void NewCustomer(int customerId, string name, int addrId, bool active, DateTime date, string user, DateTime date1, string user1)
         {
             Customer temp = new Customer(customerId,name,addrId,active,date,user,date1,user1);
@@ -581,7 +577,7 @@ namespace Appointment_Manager
                     }
                 }
                 dataTable.Rows.Add(row);
-                
+
             }
             dataTable.DefaultView.Sort = "Start ASC";
             return dataTable;
@@ -669,7 +665,7 @@ namespace Appointment_Manager
                 string cityString = "INSERT INTO city VALUES (@cityId,@city,@countryId,@time1,@user1,@time2,@user2)";
                 string addrString = "INSERT INTO address values (@addrId,@ad1,@ad2,@cityId,@postal,@phone,@time1,@user1,@time2,@user2)";
                 string custString = "INSERT INTO customer VALUES (@customerId,@name,@addrId,@bool,@time1,@user1,@time2,@user2)";
-                
+
                 UpdateIndex();
 
                 MySqlConnection connection = ConnectToDB();
@@ -956,6 +952,7 @@ namespace Appointment_Manager
 
         private void UserNotification()
         {
+            //  Labor intensive, currently goes through all appointments instead of just appointments for the logged in user.
             foreach (Appointment a in Appointments)
             {
                 if (a.UserId == User.UserId)
@@ -1004,7 +1001,7 @@ namespace Appointment_Manager
                     start = DateTime.UtcNow.AddDays(-3);
                     end = DateTime.UtcNow.AddDays(+3);
                     break;
-                case DayOfWeek.Thursday:                    
+                case DayOfWeek.Thursday:
                     start = DateTime.UtcNow.AddDays(-4);
                     end = DateTime.UtcNow.AddDays(+2);
                     break;
@@ -1067,7 +1064,7 @@ namespace Appointment_Manager
             dataGridView1.DataSource = null;
             DataTable dataTable = new DataTable();
             MySqlConnection connection = ConnectToDB();
-            connection.Open();            
+            connection.Open();
             string sql = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
             MySqlCommand cmd = new MySqlCommand(sql, connection);
             MySqlDataAdapter rdr = new MySqlDataAdapter(cmd);
