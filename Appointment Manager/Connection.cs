@@ -6,17 +6,18 @@ namespace Appointment_Manager
 {
     internal class Connection
     {
-        private string windowText = "Appointment Manager";
+        private readonly string windowText = "Appointment Manager";
         //  Strings for database.
         private static readonly string server = "localhost";
         private static readonly string database = "clientschedule";
-        private static readonly string uid = "root";
+        private static readonly string uid = "Student";
         private static readonly string pass = "student";
         //  Connection string.
         private static readonly string connectionString = "server=" + Connection.server + ";" + "userid=" + Connection.uid + ";" +
             "password=" + Connection.pass + ";" + "database=" + Connection.database + ";";
         //
-        private MySqlConnection connection { get; set; }
+        public MySqlConnection connection { get; private set; }
+
         //
         public void CreateConnection()
         {

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using MySql.Data.MySqlClient;
 
 namespace Appointment_Manager
@@ -16,14 +15,6 @@ namespace Appointment_Manager
         private Customers Customer;
         private Appointments Aptmnts;
         private Search Search;
-        //  Strings for database.
-        private static readonly string server = "localhost";
-        private static readonly string database = "clientschedule";
-        private static readonly string uid = "root";
-        private static readonly string pass = "student";
-        //  Connection string.
-        private static readonly string connectionString = "server=" + Main.server + ";" + "userid=" + Main.uid + ";" +
-            "password=" + Main.pass + ";" + "database=" + Main.database + ";";
         //  Index of next table rows.
         private int customerIndex;
         private int addressIndex;
@@ -55,11 +46,12 @@ namespace Appointment_Manager
             CNObject.CreateConnection();
             CNObject.ConnectionOpen();
             //  Load all users.
-            string sqlString = "SELECT * FROM user";
+            //string sqlString = "SELECT * FROM user";
+            string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user;";
             MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
-                Users.Add(NewUser(rdr));
+                Users.Add(NewUser(false,rdr));
             }
             rdr.Close();
             CNObject.ConnectionClose();
@@ -75,11 +67,10 @@ namespace Appointment_Manager
             var confirm = Login.ShowDialog();
             if (confirm == DialogResult.OK)
             {
-                //  Create connection object.
                 Connection CNObject = new Connection();
                 CNObject.CreateConnection();
                 CNObject.ConnectionOpen();
-                //  Load appointments into collection list.
+                //  Load logged in users appointments.
                 String sqlString = "SELECT * FROM appointment where userId=" + User.UserId;
                 MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
                 while (rdr.Read())
@@ -95,23 +86,6 @@ namespace Appointment_Manager
             }
         }
 
-        private MySqlConnection ConnectToDB()
-        {
-            MySqlConnection connection = new MySqlConnection(connectionString);
-            try
-            {
-                //  Make sure we can connect to database.
-                connection.Open();
-                connection.Close();
-                return connection;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can not open connection to database: " + '\n' + ex, this.Text);
-                return null;
-            }
-        }
-
         public void UpdateAppointments()
         {
             dataGridView1.DataSource = null;
@@ -124,12 +98,12 @@ namespace Appointment_Manager
 
         private void UpdateIndex()
         {
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             //  --------------------------------------------------------
             string sqlString = "SELECT MAX(customerId) from customer";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 customerIndex = int.Parse(rdr[0].ToString()) + 1;
@@ -137,8 +111,7 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT MAX(addressId) from address";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 addressIndex = int.Parse(rdr[0].ToString()) + 1;
@@ -146,8 +119,7 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT MAX(cityId) from city";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 cityIndex = int.Parse(rdr[0].ToString()) + 1;
@@ -155,8 +127,7 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT MAX(countryId) from country";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 countryIndex = int.Parse(rdr[0].ToString()) + 1;
@@ -164,15 +135,14 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT MAX(appointmentId) from appointment";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 appointmentIndex = int.Parse(rdr[0].ToString()) + 1;
             }
             rdr.Close();
             //  --------------------------------------------------------
-            connection.Close();
+            CNObject.ConnectionClose();
         }
 
         private void NewAddr(MySqlDataReader rdr)
@@ -291,19 +261,37 @@ namespace Appointment_Manager
             Customers.Add(temp);
         }
 
-        private User NewUser(MySqlDataReader rdr)
+        private User NewUser(bool pass,MySqlDataReader rdr)
         {
-            return User = new User
+            //  Pass in true to get user password, if false we set to null.
+            if (pass)
+            {
+                return User = new User
                     (
                        int.Parse(rdr[0].ToString()),
                        rdr[1].ToString(),
-                       rdr[2].ToString(),
+                       rdr[2].ToString(),// password
                        byte.Parse(rdr[3].ToString()),
                        DateTime.SpecifyKind((DateTime)rdr[4], DateTimeKind.Utc),
                        rdr[5].ToString(),
                        DateTime.SpecifyKind((DateTime)rdr[6], DateTimeKind.Utc),
                        rdr[7].ToString()
                     );
+            }
+            else
+            {
+                return User = new User
+                    (
+                       int.Parse(rdr[0].ToString()),
+                       rdr[1].ToString(),
+                       null,//  password
+                       byte.Parse(rdr[2].ToString()),
+                       DateTime.SpecifyKind((DateTime)rdr[3], DateTimeKind.Utc),
+                       rdr[4].ToString(),
+                       DateTime.SpecifyKind((DateTime)rdr[5], DateTimeKind.Utc),
+                       rdr[6].ToString()
+                    );
+            }
         }
 
         public void LoadCustomers()
@@ -316,12 +304,12 @@ namespace Appointment_Manager
                 Countries.Clear();
                 Customers.Clear();
             }
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             //  --------------------------------------------------------
             String sqlString = "SELECT * FROM customer";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 NewCustomer(rdr);
@@ -329,8 +317,7 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT * FROM address";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 NewAddr(rdr);
@@ -338,8 +325,7 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT * FROM city";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 NewCity(rdr);
@@ -347,27 +333,25 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             sqlString = "SELECT * FROM country";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 NewCountry(rdr);
             }
             rdr.Close();
             //  --------------------------------------------------------
-            connection.Close();
+            CNObject.ConnectionClose();
             UpdateIndex();
         }
 
         public DataTable UserList(bool all)
         {
             //  Connect to database.
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             String sqlString = "SELECT userName,userId FROM user";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            //  ---------------------------------
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
@@ -379,7 +363,7 @@ namespace Appointment_Manager
                 dataTable.Rows.Add(row);
             }
             rdr.Close();
-            connection.Close();
+            CNObject.ConnectionClose();
             if (!all)
             {
                 //  Filter to just the logged in users appointments.
@@ -390,11 +374,11 @@ namespace Appointment_Manager
 
         public DataTable CustomerList()
         {
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             String sqlString = "SELECT customerName,customerId FROM customer";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
@@ -406,7 +390,7 @@ namespace Appointment_Manager
                 dataTable.Rows.Add(row);
             }
             rdr.Close();
-            connection.Close();
+            CNObject.ConnectionClose();
             return dataTable;
         }
 
@@ -445,12 +429,13 @@ namespace Appointment_Manager
 
             UpdateIndex();
 
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             MySqlCommand cmd;
             try
             {
-                cmd = new MySqlCommand(sqlCommand, connection);
+                cmd = new MySqlCommand(sqlCommand, CNObject.connection);
                 cmd.Parameters.AddWithValue("@appointmentId", appointmentIndex);
                 cmd.Parameters.AddWithValue("@customer", customerId);
                 cmd.Parameters.AddWithValue("@user", userId);
@@ -468,11 +453,12 @@ namespace Appointment_Manager
                 cmd.Parameters.AddWithValue("@user2", User.UserName);
                 cmd.ExecuteNonQuery();
                 NewAppointment(appointmentIndex, customerId, userId, title, desc, location, contact, type, url, start, end, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
-                connection.Close();
+                CNObject.ConnectionClose();
                 return true;
             }
             catch (Exception ex)
             {
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error adding records to database: " + '\n' + ex, this.Text);
                 return false;
             }
@@ -487,12 +473,13 @@ namespace Appointment_Manager
             string url = "not needed";
             string sqlCommand = "UPDATE appointment SET customerId = @customer, userId = @user,type = @type,start = @start,end = @end,lastUpdate = @time2,lastUpdateBy = @user2 WHERE appointmentId = @appointmentId";
 
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             MySqlCommand cmd;
             try
             {
-                cmd = new MySqlCommand(sqlCommand, connection);
+                cmd = new MySqlCommand(sqlCommand, CNObject.connection);
                 cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
                 cmd.Parameters.AddWithValue("@customer", customerId);
                 cmd.Parameters.AddWithValue("@user", userId);
@@ -506,11 +493,12 @@ namespace Appointment_Manager
                 //  One line of code instead of 11 lines for a method to do the same thing.
                 foreach (Appointment apt in Appointments.Where(x => x.AppointmentId == appointmentId).ToList()) Appointments.Remove(apt);
                 NewAppointment(appointmentId, customerId, userId, title, desc, location, contact, type, url, start, end, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
-                connection.Close();
+                CNObject.ConnectionClose();
                 return true;
             }
             catch (Exception ex)
             {
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error adding records to database: " + '\n' + ex, this.Text);
                 return false;
             }
@@ -519,22 +507,24 @@ namespace Appointment_Manager
         public bool RemoveAppointment(int appointmentId)
         {
             string sqlCommand = "DELETE FROM appointment WHERE appointmentId=@appointmentId";
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             MySqlCommand cmd;
             try
             {
-                cmd = new MySqlCommand(sqlCommand, connection);
+                cmd = new MySqlCommand(sqlCommand, CNObject.connection);
                 cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
                 cmd.ExecuteNonQuery();
                 //  Lambda expression to find our object and remove the old one from our collection.
                 //  One line of code instead of 11 lines for a method to do the same thing.
                 foreach (Appointment apt in Appointments.Where(x => x.AppointmentId == appointmentId).ToList()) Appointments.Remove(apt);
-                connection.Close();
+                CNObject.ConnectionClose();
                 return true;
             }
             catch (Exception ex)
             {
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error removing records from database: " + '\n' + ex, this.Text);
                 return false;
             }
@@ -673,12 +663,13 @@ namespace Appointment_Manager
 
                 UpdateIndex();
 
-                MySqlConnection connection = ConnectToDB();
-                connection.Open();
+                Connection CNObject = new Connection();
+                CNObject.CreateConnection();
+                CNObject.ConnectionOpen();
                 MySqlCommand cmd;
                 try
                 {
-                    cmd = new MySqlCommand(countryString, connection);
+                    cmd = new MySqlCommand(countryString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@countryId", countryIndex);
                     cmd.Parameters.AddWithValue("@country", country);
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
@@ -688,7 +679,7 @@ namespace Appointment_Manager
                     cmd.ExecuteNonQuery();
                     NewCountry(countryIndex,country,DateTime.UtcNow,User.UserName,DateTime.UtcNow,User.UserName);
 
-                    cmd = new MySqlCommand(cityString, connection);
+                    cmd = new MySqlCommand(cityString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@cityId", cityIndex);
                     cmd.Parameters.AddWithValue("@city", city);
                     cmd.Parameters.AddWithValue("@countryId", countryIndex);
@@ -699,7 +690,7 @@ namespace Appointment_Manager
                     cmd.ExecuteNonQuery();
                     NewCity(cityIndex, city, countryIndex, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                    cmd = new MySqlCommand(addrString, connection);
+                    cmd = new MySqlCommand(addrString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@addrId", addressIndex);
                     cmd.Parameters.AddWithValue("@ad1", ad1);
                     cmd.Parameters.AddWithValue("@ad2", ad2);
@@ -713,7 +704,7 @@ namespace Appointment_Manager
                     cmd.ExecuteNonQuery();
                     NewAddr(addressIndex,ad1,ad2,cityIndex,postal,phone,DateTime.UtcNow,User.UserName,DateTime.UtcNow,User.UserName);
 
-                    cmd = new MySqlCommand(custString, connection);
+                    cmd = new MySqlCommand(custString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@customerId", customerIndex);
                     cmd.Parameters.AddWithValue("@name", name);
                     cmd.Parameters.AddWithValue("@addrId", addressIndex);
@@ -725,11 +716,12 @@ namespace Appointment_Manager
                     cmd.ExecuteNonQuery();
                     NewCustomer(customerIndex,name,addressIndex,true,DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                    connection.Close();
+                    CNObject.ConnectionClose();
                     return true;
                 }
                 catch (Exception ex)
                 {
+                    CNObject.ConnectionClose();
                     MessageBox.Show("Error adding records to database: " + '\n' + ex, this.Text);
                     return false;
                 }
@@ -743,12 +735,13 @@ namespace Appointment_Manager
             string addrString = "UPDATE address SET address = @ad1, address2 = @ad2, cityId = @cityId, postalCode = @postal, phone = @phone, lastUpdate = @time1, lastUpdateBy = @user1 WHERE addressId = @addrId";
             string custString = "UPDATE customer SET customerName = @name, addressId = @addrId, active = @bool, lastUpdate = @time1, lastUpdateBy = @user1 WHERE customerId = @customerId";
 
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             MySqlCommand cmd;
             try
             {
-                cmd = new MySqlCommand(countryString, connection);
+                cmd = new MySqlCommand(countryString, CNObject.connection);
                 cmd.Parameters.AddWithValue("@country", country);
                 cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
                 cmd.Parameters.AddWithValue("@user1", User.UserName);
@@ -758,7 +751,7 @@ namespace Appointment_Manager
                 foreach (Country c in Countries.Where(x => x.CountryId == countryId).ToList()) Countries.Remove(c);
                 NewCountry(countryId, country, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                cmd = new MySqlCommand(cityString, connection);
+                cmd = new MySqlCommand(cityString, CNObject.connection);
                 cmd.Parameters.AddWithValue("@city", city);
                 cmd.Parameters.AddWithValue("@countryId", countryId);
                 cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
@@ -768,7 +761,7 @@ namespace Appointment_Manager
                 foreach (City c in Cities.Where(x => x.CityId == cityId).ToList()) Cities.Remove(c);
                 NewCity(cityId, city, countryId, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                cmd = new MySqlCommand(addrString, connection);
+                cmd = new MySqlCommand(addrString, CNObject.connection);
                 cmd.Parameters.AddWithValue("@ad1", ad1);
                 cmd.Parameters.AddWithValue("@ad2", ad2);
                 cmd.Parameters.AddWithValue("@cityId", cityId);
@@ -781,7 +774,7 @@ namespace Appointment_Manager
                 foreach (Address a in Addresses.Where(x => x.AddressId == addressId).ToList()) Addresses.Remove(a);
                 NewAddr(addressId, ad1, ad2, cityId, postal, phone, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                cmd = new MySqlCommand(custString, connection);
+                cmd = new MySqlCommand(custString, CNObject.connection);
                 cmd.Parameters.AddWithValue("@name", name);
                 cmd.Parameters.AddWithValue("@addrId", addressId);
                 cmd.Parameters.AddWithValue("@bool", true);
@@ -792,11 +785,12 @@ namespace Appointment_Manager
                 foreach (Customer c in Customers.Where(x => x.CustomerId == customerId).ToList()) Customers.Remove(c);
                 NewCustomer(customerId, name, addressId, true, DateTime.UtcNow, User.UserName, DateTime.UtcNow, User.UserName);
 
-                connection.Close();
+                CNObject.ConnectionClose();
                 return true;
             }
             catch (Exception ex)
             {
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error updating records in database: " + '\n' + ex, this.Text);
                 return false;
             }
@@ -809,21 +803,22 @@ namespace Appointment_Manager
             string addrString = "DELETE FROM address WHERE addressId=@addressId";
             string custString = "DELETE FROM customer WHERE customerId=@customerId";
 
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             MySqlCommand cmd;
             object reader;
             try
             {
                 // check for appointments, unable to delete a customer with appointments.
                 string custcheck = "select customerId from appointment where customerId=@cust";
-                cmd = new MySqlCommand(custcheck, connection);
+                cmd = new MySqlCommand(custcheck, CNObject.connection);
                 cmd.Parameters.AddWithValue("@cust", cust);
                 reader = cmd.ExecuteScalar();
                 if (reader == null)
                 {
                     //  No rows returned from appointment table, safe to delete customer.
-                    cmd = new MySqlCommand(custString, connection);
+                    cmd = new MySqlCommand(custString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@customerId", cust);
                     cmd.ExecuteNonQuery();
                     foreach (Customer c in Customers.Where(x => x.CustomerId == cust).ToList()) Customers.Remove(c);
@@ -836,12 +831,12 @@ namespace Appointment_Manager
                     {
                         //  remove appointments from table
                         string delapts = "delete from appointment where customerId=@cust";
-                        cmd = new MySqlCommand(delapts, connection);
+                        cmd = new MySqlCommand(delapts, CNObject.connection);
                         cmd.Parameters.AddWithValue("@cust", cust);
                         cmd.ExecuteNonQuery();
                         foreach (Appointment apt in Appointments.Where(x => x.CustomerId == cust).ToList()) Appointments.Remove(apt);
                         //  remove customer
-                        cmd = new MySqlCommand(custString, connection);
+                        cmd = new MySqlCommand(custString, CNObject.connection);
                         cmd.Parameters.AddWithValue("@customerId", cust);
                         cmd.ExecuteNonQuery();
                         foreach (Customer c in Customers.Where(x => x.CustomerId == cust).ToList()) Customers.Remove(c);
@@ -853,48 +848,48 @@ namespace Appointment_Manager
                 }
                 // remove address if no associated customer reference
                 string addrcheck = "select addressId from customer where addressId=@addr";
-                cmd = new MySqlCommand(addrcheck, connection);
+                cmd = new MySqlCommand(addrcheck, CNObject.connection);
                 cmd.Parameters.AddWithValue("@addr", addr);
                 reader = cmd.ExecuteScalar();
                 if (reader == null)
                 {
                     //  will be null if no rows in table match.
-                    cmd = new MySqlCommand(addrString, connection);
+                    cmd = new MySqlCommand(addrString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@addressId", addr);
                     cmd.ExecuteNonQuery();
                     foreach (Address a in Addresses.Where(x => x.AddressId == addr).ToList()) Addresses.Remove(a);
                 }
                 // remove city if no associated address reference
                 string citycheck = "select cityId from address where cityId=@city";
-                cmd = new MySqlCommand(citycheck, connection);
+                cmd = new MySqlCommand(citycheck, CNObject.connection);
                 cmd.Parameters.AddWithValue("@city", city);
                 reader = cmd.ExecuteScalar();
                 if (reader == null)
                 {
-                    cmd = new MySqlCommand(cityString, connection);
+                    cmd = new MySqlCommand(cityString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@cityId", city);
                     cmd.ExecuteNonQuery();
                     foreach (City c in Cities.Where(x => x.CityId == city).ToList()) Cities.Remove(c);
                 }
                 // remove country if no associated city reference
                 string cntrycheck = "select countryId from city where countryId=@cntry";
-                cmd = new MySqlCommand(cntrycheck, connection);
+                cmd = new MySqlCommand(cntrycheck, CNObject.connection);
                 cmd.Parameters.AddWithValue("@cntry", cntry);
                 reader = cmd.ExecuteScalar();
                 if (reader == null)
                 {
-                    cmd = new MySqlCommand(countryString, connection);
+                    cmd = new MySqlCommand(countryString, CNObject.connection);
                     cmd.Parameters.AddWithValue("@countryId", cntry);
                     cmd.ExecuteNonQuery();
                     foreach (Country c in Countries.Where(x => x.CountryId == cntry).ToList()) Countries.Remove(c);
                 }
                 //
-                connection.Close();
+                CNObject.ConnectionClose();
                 return true;
             }
             catch (Exception ex)
             {
-                connection.Close();
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error removing records from database: " + '\n' + ex, this.Text);
                 return false;
             }
@@ -908,25 +903,25 @@ namespace Appointment_Manager
                 User = null;
             }
             string[] results = new string[2];
-            //  database connection.
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             String sqlString = "SELECT * FROM user WHERE userName = @user";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
+            MySqlCommand cmd = new MySqlCommand(sqlString, CNObject.connection);
             cmd.Parameters.AddWithValue("@user", user);
             try
             {
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {
-                    User = NewUser(rdr);
+                    User = NewUser(true,rdr);
                 }
                 rdr.Close();
-                connection.Close();
+                CNObject.ConnectionClose();
             }
             catch (Exception ex)
             {
-                connection.Close();
+                CNObject.ConnectionClose();
                 MessageBox.Show("Error retrieving user record from database: " + '\n'+ ex,this.Text);
                 results[0] = "False";
                 results[1] = "DB";
