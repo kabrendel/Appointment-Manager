@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using MySql.Data.MySqlClient;
 
 namespace Appointment_Manager
@@ -49,29 +50,19 @@ namespace Appointment_Manager
             Countries = new BindingList<Country>();
             Customers = new BindingList<Customer>();
             Users = new BindingList<User>();
-            //
-            //  Load appointments into collection list.
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
-            String sqlString = "SELECT * FROM appointment";
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataReader rdr = cmd.ExecuteReader();
-            while (rdr.Read())
-            {
-                NewAppointment(rdr);
-            }
-            rdr.Close();
-            //
-            //  Fill collection of users for creating appointments.
-            sqlString = "SELECT * FROM user";
-            cmd = new MySqlCommand(sqlString, connection);
-            rdr = cmd.ExecuteReader();
+            //  Load all users
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
+            //  Load all users.
+            string sqlString = "SELECT * FROM user";
+            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             while (rdr.Read())
             {
                 Users.Add(NewUser(rdr));
             }
             rdr.Close();
-            connection.Close();
+            CNObject.ConnectionClose();
             //
             //  Fill collections for customers
             LoadCustomers();
@@ -84,6 +75,20 @@ namespace Appointment_Manager
             var confirm = Login.ShowDialog();
             if (confirm == DialogResult.OK)
             {
+                //  Create connection object.
+                Connection CNObject = new Connection();
+                CNObject.CreateConnection();
+                CNObject.ConnectionOpen();
+                //  Load appointments into collection list.
+                String sqlString = "SELECT * FROM appointment where userId=" + User.UserId;
+                MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
+                while (rdr.Read())
+                {
+                    NewAppointment(rdr);
+                }
+                rdr.Close();
+                CNObject.ConnectionClose();
+
                 UserNotification();
                 //  Set datasource and view for Main's dataGridView1;
                 UpdateAppointments();
@@ -952,7 +957,7 @@ namespace Appointment_Manager
 
         private void UserNotification()
         {
-            //  Labor intensive, currently goes through all appointments instead of just appointments for the logged in user.
+            //  Currently only the logged in users appointments.
             foreach (Appointment a in Appointments)
             {
                 if (a.UserId == User.UserId)
@@ -1063,14 +1068,14 @@ namespace Appointment_Manager
         {
             dataGridView1.DataSource = null;
             DataTable dataTable = new DataTable();
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             string sql = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            MySqlDataAdapter rdr = new MySqlDataAdapter(cmd);
+            MySqlDataAdapter rdr = CNObject.SQLAdapter(sql);
             rdr.Fill(dataTable);
             rdr.Dispose();
-            connection.Close();
+            CNObject.ConnectionClose();
             dataGridView1.DataSource = dataTable;
         }
 
@@ -1085,14 +1090,14 @@ namespace Appointment_Manager
         {
             dataGridView1.DataSource = null;
             DataTable dataTable = new DataTable();
-            MySqlConnection connection = ConnectToDB();
-            connection.Open();
+            Connection CNObject = new Connection();
+            CNObject.CreateConnection();
+            CNObject.ConnectionOpen();
             string sql = "Select customerName Customer, type Type,COUNT(*) Appointments from appointment join customer on appointment.customerId = customer.customerId GROUP BY Customer, Type";
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            MySqlDataAdapter rdr = new MySqlDataAdapter(cmd);
+            MySqlDataAdapter rdr = CNObject.SQLAdapter(sql);
             rdr.Fill(dataTable);
             rdr.Dispose();
-            connection.Close();
+            CNObject.ConnectionClose();
             dataGridView1.DataSource = dataTable;
         }
 

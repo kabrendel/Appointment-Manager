@@ -62,6 +62,7 @@
       <DependentUpon>AptmntD.cs</DependentUpon>
     </Compile>
     <Compile Include="City.cs" />
+    <Compile Include="Connection.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Customers.cs">
