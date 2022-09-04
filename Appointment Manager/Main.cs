@@ -41,11 +41,15 @@ namespace Appointment_Manager
             Countries = new BindingList<Country>();
             Customers = new BindingList<Customer>();
             Users = new BindingList<User>();
+            //  Load objects for Main screen DGV.
+            DBObjects DBObject = new DBObjects();
+            DBObject.LoadUsers();
+            //DBObject.LoadCustomers()
+            //
             //  Load all users
             Connection CNObject = new Connection();
             CNObject.CreateConnection();
             CNObject.ConnectionOpen();
-            //  Load all users.
             //string sqlString = "SELECT * FROM user";
             string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user;";
             MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
@@ -902,7 +906,8 @@ namespace Appointment_Manager
                 // Reset user object created below.
                 User = null;
             }
-            string[] results = new string[2];
+            string[] results    = new string[2];
+            //string[] userLogin  = new string[2];
             Connection CNObject = new Connection();
             CNObject.CreateConnection();
             CNObject.ConnectionOpen();
@@ -914,7 +919,9 @@ namespace Appointment_Manager
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {
-                    User = NewUser(true,rdr);
+                    //User = NewUser(true,rdr);
+                    //userLogin[0] = rdr[0];
+                    //userLogin[1] = rdr[1];
                 }
                 rdr.Close();
                 CNObject.ConnectionClose();
