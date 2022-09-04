@@ -33,7 +33,7 @@ namespace Appointment_Manager
             Type = new List<string>();
             Customer = new DataTable();
             User = new DataTable();
-
+            main.DBObject.LoadAppointments(main.User.UserId);
             dataGridView1.DataSource = main.BuildAppointmentTable();
             (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("[User Id] = {0}", main.User.UserId);
             dataGridView1.Columns[0].Visible = false;
@@ -56,8 +56,8 @@ namespace Appointment_Manager
 
         private void ButtonExit_Click(object sender, EventArgs e)
         {
+            main.DBObject.LoadAppointments(main.User.UserId);
             main.UpdateAppointments();
-            
             Dispose();
         }
 
@@ -94,6 +94,7 @@ namespace Appointment_Manager
                     //  Error message shown in method call.
                 }
                 //  reload appointments.
+                main.DBObject.LoadAppointments(main.User.UserId);
                 dataGridView1.DataSource = main.BuildAppointmentTable();
                 (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("[User Id] = {0}", main.User.UserId);
             }
@@ -139,7 +140,8 @@ namespace Appointment_Manager
                 {
                     //  Error message shown in method call.
                 }
-                //  reload appointments.                
+                //  reload appointments.
+                main.DBObject.LoadAppointments(main.User.UserId);
                 dataGridView1.DataSource = main.BuildAppointmentTable();
                 (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("[User Id] = {0}", main.User.UserId);
             }
@@ -159,6 +161,7 @@ namespace Appointment_Manager
                 if (main.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
                 {
                     MessageBox.Show("Appointment deleted.", this.Text);
+                    main.DBObject.LoadAppointments(main.User.UserId);
                     dataGridView1.DataSource = main.BuildAppointmentTable();
                     (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("[User Id] = {0}", main.User.UserId);
                 }

@@ -33,7 +33,7 @@ namespace Appointment_Manager
 
         private void Customers_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = main.BuildCustomerTable();            
+            dataGridView1.DataSource = main.BuildCustomerTable();
             //  Hide Id columns.
             dataGridView1.Columns[0].Visible = false;
             dataGridView1.Columns[2].Visible = false;
@@ -167,7 +167,7 @@ namespace Appointment_Manager
                 textPhone.Text = row.Cells["Phone number"].Value.ToString();
             }
         }
-        
+
         private bool ValidateText()
         {
             bool valid = true;

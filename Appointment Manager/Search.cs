@@ -53,6 +53,7 @@ namespace Appointment_Manager
             //
             dateTimePicker1.Value = dateTimePicker1.MinDate;
             dateTimePicker2.Value = dateTimePicker2.MaxDate;
+            main.DBObject.LoadAppointments();
             dataGridView1.DataSource = main.BuildAppointmentTable();
             dataGridView1.Columns[0].Visible = false;
             dataGridView1.Columns[2].Visible = false;
