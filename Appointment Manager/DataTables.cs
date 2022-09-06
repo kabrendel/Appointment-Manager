@@ -38,25 +38,12 @@ namespace Appointment_Manager
         }
         public List<string> TypeList()
         {
-            //  Connect to database.
-            //MySqlConnection connection = ConnectToDB();
-            //connection.Open();
-            //String sqlString = "SELECT DISTINCT type FROM appointment";
-            //MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            ////  ---------------------------------
-            //MySqlDataReader rdr = cmd.ExecuteReader();
-            //List<string> list = new List<string>();
-            //while (rdr.Read())
-            //{
-            //    list.Add(rdr[0].ToString());
-            //}
-            //rdr.Close();
-            //connection.Close();
-            //  Changed to match evaluation issue..
-            List<string> list = new List<string>();
-            list.Add("Test");
-            list.Add("Scrum");
-            list.Add("Presentation");
+            List<string> list = new List<string>
+            {
+                "Test",
+                "Scrum",
+                "Presentation"
+            };
             return list;
         }
         public DataTable UserList(bool all)
@@ -169,13 +156,13 @@ namespace Appointment_Manager
                             if (i.CityId == a.CityId)
                             {
                                 row["City Id"] = i.CityId;
-                                row["City"] = i.city;
+                                row["City"] = i.ACity;
                                 foreach (Country y in DBObject.Countries)
                                 {
                                     if (y.CountryId == i.CountryId)
                                     {
                                         row["Country Id"] = y.CountryId;
-                                        row["Country"] = y.country;
+                                        row["Country"] = y.ACountry;
                                         goto Rowbuilt;
                                     }
                                 }

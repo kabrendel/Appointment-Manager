@@ -8,13 +8,13 @@ namespace Appointment_Manager
     {
         private readonly string windowText = "Appointment Manager";
         //  Strings for database.
-        private static readonly string server = "localhost";
-        private static readonly string database = "clientschedule";
-        private static readonly string uid = "Student";
-        private static readonly string pass = "student";
+        private const string server = "localhost";
+        private const string database = "clientschedule";
+        private const string uid = "Student";
+        private const string pass = "student";
         //  Connection string.
-        private static readonly string connectionString = "server=" + Connection.server + ";" + "userid=" + Connection.uid + ";" +
-            "password=" + Connection.pass + ";" + "database=" + Connection.database + ";";
+        private const string connectionString = "server=" + Appointment_Manager.Connection.server + ";userid=" + Appointment_Manager.Connection.uid + ";" +
+            "password=" + Appointment_Manager.Connection.pass + ";database=" + Appointment_Manager.Connection.database + ";";
         //
         public MySqlConnection connection { get; private set; }
 

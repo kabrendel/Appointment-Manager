@@ -8,12 +8,12 @@ namespace Appointment_Manager
     public class DBObjects
     {
         //  Collections for database objects.
-        public BindingList<Address> Addresses { get; private set; }
-        public BindingList<Appointment> Appointments { get; private set; }
-        public BindingList<City> Cities { get; private set; }
-        public BindingList<Country> Countries { get; private set; }
-        public BindingList<Customer> Customers { get; private set; }
-        public BindingList<User> Users { get; private set; }
+        public BindingList<Address> Addresses { get; }
+        public BindingList<Appointment> Appointments { get; }
+        public BindingList<City> Cities { get;}
+        public BindingList<Country> Countries { get;}
+        public BindingList<Customer> Customers { get;}
+        public BindingList<User> Users { get;}
         //
         public DBObjects()
         {

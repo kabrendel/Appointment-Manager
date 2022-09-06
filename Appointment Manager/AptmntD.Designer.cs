@@ -1,7 +1,7 @@
 ﻿
 namespace Appointment_Manager
 {
-    partial class AptmntD
+    partial class AppointmentDialog
     {
         /// <summary>
         /// Required designer variable.

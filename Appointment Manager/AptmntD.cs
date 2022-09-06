@@ -5,20 +5,20 @@ using System.Windows.Forms;
 
 namespace Appointment_Manager
 {
-    public partial class AptmntD : Form
+    public partial class AppointmentDialog : Form
     {
         readonly Appointments apt;
-        public AptmntD(List<string> Type, DataTable Customer, DataTable User, Appointments apt)
+        public AppointmentDialog(List<string> Type, DataTable Customer, DataTable User, Appointments apt)
         {
             InitializeComponent();
             this.apt = apt;
-            apt.aType = null;
-            apt.aCustomer = 0;
-            apt.aUser = 0;
-            apt.aStart = null;
-            apt.aStartTime = null;
-            apt.aEnd = null;
-            apt.aEndTime = null;
+            apt.AType = null;
+            apt.ACustomer = 0;
+            apt.AUser = 0;
+            apt.AStart = null;
+            apt.AStartTime = null;
+            apt.AEnd = null;
+            apt.AEndTime = null;
 
             buttonAccept.DialogResult = DialogResult.OK;
             buttonExit.DialogResult = DialogResult.Cancel;
@@ -65,18 +65,17 @@ namespace Appointment_Manager
 
         private void ButtonExit_Click(object sender, EventArgs e)
         {
-            
         }
 
         private void ButtonAccept_Click(object sender, EventArgs e)
         {
-            apt.aType = cmbType.SelectedItem.ToString();                    //  Appointment Type
-            apt.aCustomer = int.Parse(cmbCust.SelectedValue.ToString());    //  Customer Id
-            apt.aUser = int.Parse(cmbUser.SelectedValue.ToString());        //  User Id
-            apt.aStart = dtpStart.Value.Date.ToString();
-            apt.aStartTime = cmbStartTime.SelectedValue.ToString();
-            apt.aEnd = dtpStart.Value.Date.ToString();
-            apt.aEndTime = cmbEndTime.SelectedValue.ToString();
+            apt.AType = cmbType.SelectedItem.ToString();                    //  Appointment Type
+            apt.ACustomer = int.Parse(cmbCust.SelectedValue.ToString());    //  Customer Id
+            apt.AUser = int.Parse(cmbUser.SelectedValue.ToString());        //  User Id
+            apt.AStart = dtpStart.Value.Date.ToString();
+            apt.AStartTime = cmbStartTime.SelectedValue.ToString();
+            apt.AEnd = dtpStart.Value.Date.ToString();
+            apt.AEndTime = cmbEndTime.SelectedValue.ToString();
         }
 
         private void SetSelected()

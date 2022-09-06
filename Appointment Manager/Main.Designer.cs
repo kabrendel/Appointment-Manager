@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.AppointmentsGridView = new System.Windows.Forms.DataGridView();
             this.buttonCust = new System.Windows.Forms.Button();
             this.buttonApt = new System.Windows.Forms.Button();
             this.buttonAll = new System.Windows.Forms.Button();
@@ -41,27 +41,27 @@
             this.buttonExit = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonSearch = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AppointmentsGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AllowUserToResizeRows = false;
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.AppointmentsGridView.AllowUserToAddRows = false;
+            this.AppointmentsGridView.AllowUserToDeleteRows = false;
+            this.AppointmentsGridView.AllowUserToResizeRows = false;
+            this.AppointmentsGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(158, 12);
-            this.dataGridView1.MultiSelect = false;
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersVisible = false;
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(630, 375);
-            this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DataGridView1_DataBindingComplete);
+            this.AppointmentsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.AppointmentsGridView.Location = new System.Drawing.Point(158, 12);
+            this.AppointmentsGridView.MultiSelect = false;
+            this.AppointmentsGridView.Name = "dataGridView1";
+            this.AppointmentsGridView.ReadOnly = true;
+            this.AppointmentsGridView.RowHeadersVisible = false;
+            this.AppointmentsGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.AppointmentsGridView.Size = new System.Drawing.Size(630, 375);
+            this.AppointmentsGridView.TabIndex = 0;
+            this.AppointmentsGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.AppointmentsGridView_DataBindingComplete);
             // 
             // buttonCust
             // 
@@ -202,13 +202,13 @@
             this.Controls.Add(this.buttonAll);
             this.Controls.Add(this.buttonApt);
             this.Controls.Add(this.buttonCust);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.AppointmentsGridView);
             this.MinimumSize = new System.Drawing.Size(815, 480);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Appointment Calendar";
             this.Load += new System.EventHandler(this.Main_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AppointmentsGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -216,7 +216,7 @@
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView AppointmentsGridView;
         private System.Windows.Forms.Button buttonCust;
         private System.Windows.Forms.Button buttonApt;
         private System.Windows.Forms.Button buttonAll;

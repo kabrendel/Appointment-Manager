@@ -12,16 +12,16 @@ namespace Appointment_Manager
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
-		public Customer(int customerId_, string customerName_, int addressId_, bool active_, DateTime createDate_, string createdBy_, DateTime lastUpdate_, string lastUpdateBy_)
+		public Customer(int _customerId, string _customerName, int _addressId, bool _active, DateTime _createDate, string _createdBy, DateTime _lastUpdate, string _lastUpdateBy)
 		{
-			this.CustomerId = customerId_;
-			this.CustomerName = customerName_;
-			this.AddressId = addressId_;
-			this.Active = active_;
-			this.CreateDate = createDate_;
-			this.CreatedBy = createdBy_;
-			this.LastUpdate = lastUpdate_;
-			this.LastUpdateBy = lastUpdateBy_;
+			this.CustomerId = _customerId;
+			this.CustomerName = _customerName;
+			this.AddressId = _addressId;
+			this.Active = _active;
+			this.CreateDate = _createDate;
+			this.CreatedBy = _createdBy;
+			this.LastUpdate = _lastUpdate;
+			this.LastUpdateBy = _lastUpdateBy;
 		}
 	}
 }

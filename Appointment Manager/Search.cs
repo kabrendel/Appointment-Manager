@@ -54,10 +54,10 @@ namespace Appointment_Manager
             dateTimePicker1.Value = dateTimePicker1.MinDate;
             dateTimePicker2.Value = dateTimePicker2.MaxDate;
             main.DBObject.LoadAppointments();
-            dataGridView1.DataSource = main.DTBuilder.BuildAppointmentTable();
-            dataGridView1.Columns[0].Visible = false;
-            dataGridView1.Columns[2].Visible = false;
-            dataGridView1.Columns[4].Visible = false;
+            SearchGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+            SearchGridView.Columns[0].Visible = false;
+            SearchGridView.Columns[2].Visible = false;
+            SearchGridView.Columns[4].Visible = false;
         }
 
         private void ButtonExit_Click(object sender, EventArgs e)
@@ -88,11 +88,7 @@ namespace Appointment_Manager
 
         private void CmbUser_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null) || (cmbUser.SelectedItem is null))
-            {
-                return;
-            }
-            else
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbUser.SelectedItem is null)))
             {
                 SetDataFilter();
             }
@@ -100,11 +96,7 @@ namespace Appointment_Manager
 
         private void CmbCust_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null) || (cmbCust.SelectedItem is null))
-            {
-                return;
-            }
-            else
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbCust.SelectedItem is null)))
             {
                 SetDataFilter();
             }
@@ -112,7 +104,7 @@ namespace Appointment_Manager
 
         private void CmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null) || (cmbType.SelectedItem is null))
+            if ((SearchGridView.DataSource is null) || (cmbType.SelectedItem is null))
             {
                 return;
             }
@@ -124,7 +116,7 @@ namespace Appointment_Manager
 
         private void DateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null))
+            if (SearchGridView.DataSource is null)
             {
                 return;
             }
@@ -136,7 +128,7 @@ namespace Appointment_Manager
 
         private void DateTimePicker2_ValueChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null))
+            if (SearchGridView.DataSource is null)
             {
                 return;
             }
@@ -148,7 +140,7 @@ namespace Appointment_Manager
 
         private void CmbStartTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null))
+            if (SearchGridView.DataSource is null)
             {
                 return;
             }
@@ -160,7 +152,7 @@ namespace Appointment_Manager
 
         private void CmbEndTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.DataSource is null))
+            if (SearchGridView.DataSource is null)
             {
                 return;
             }
@@ -192,7 +184,9 @@ namespace Appointment_Manager
                 }
                 finalfilter.Append(s);
             }
-            (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = finalfilter.ToString();
+            (SearchGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = finalfilter.ToString();
         }
 
         private void ButtonReset_Click(object sender, EventArgs e)
@@ -204,12 +198,14 @@ namespace Appointment_Manager
             dateTimePicker2.Value = dateTimePicker1.MaxDate;
             cmbStartTime.SelectedIndex = 0;
             cmbEndTime.SelectedIndex = cmbEndTime.Items.Count - 1;
-            (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = string.Empty;
+            (SearchGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = string.Empty;
         }
 
-        private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void SearchGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            SearchGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         //

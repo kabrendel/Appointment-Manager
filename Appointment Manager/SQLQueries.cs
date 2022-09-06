@@ -1,11 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace Appointment_Manager
 {
@@ -124,7 +120,6 @@ namespace Appointment_Manager
         {
             if (customerId != 0)
             {
-                //  testing...
                 return false;
             }
             else

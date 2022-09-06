@@ -5,21 +5,21 @@ namespace Appointment_Manager
 	public class City
 	{
 		public int CityId { get; set; }
-		public string city { get; set; }
+		public string ACity { get; set; }
 		public int CountryId { get; set; }
 		public DateTime CreateDate { get; set; }
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
-		public City(int cityId_, string city_, int countryId_, DateTime createDate_, string createdBy_, DateTime lastUpdate_, string lastUpdateBy_)
+		public City(int _cityId, string _city, int _countryId, DateTime _createDate, string _createdBy, DateTime _lastUpdate, string _lastUpdateBy)
 		{
-			this.CityId = cityId_;
-			this.city = city_;
-			this.CountryId = countryId_;
-			this.CreateDate = createDate_;
-			this.CreatedBy = createdBy_;
-			this.LastUpdate = lastUpdate_;
-			this.LastUpdateBy = lastUpdateBy_;
+			this.CityId = _cityId;
+			this.ACity = _city;
+			this.CountryId = _countryId;
+			this.CreateDate = _createDate;
+			this.CreatedBy = _createdBy;
+			this.LastUpdate = _lastUpdate;
+			this.LastUpdateBy = _lastUpdateBy;
 		}
 	}
 }

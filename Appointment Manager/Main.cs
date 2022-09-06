@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Linq;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -43,12 +42,12 @@ namespace Appointment_Manager
         public void UpdateAppointments()
         {
             //  rename? possibly move to DataTables
-            dataGridView1.DataSource = null;
-            dataGridView1.DataSource = DTBuilder.BuildAppointmentTable();
-            dataGridView1.Columns[0].Visible = false;
-            dataGridView1.Columns[2].Visible = false;
-            dataGridView1.Columns[4].Visible = false;
-            (dataGridView1.DataSource as DataTable)
+            AppointmentsGridView.DataSource = null;
+            AppointmentsGridView.DataSource = DTBuilder.BuildAppointmentTable();
+            AppointmentsGridView.Columns[0].Visible = false;
+            AppointmentsGridView.Columns[2].Visible = false;
+            AppointmentsGridView.Columns[4].Visible = false;
+            (AppointmentsGridView.DataSource as DataTable)
                 .DefaultView
                 .RowFilter = String.Format("[User Id] = {0}", User.UserId);
         }
@@ -185,7 +184,10 @@ namespace Appointment_Manager
                     end = DateTime.UtcNow;
                     break;
             }
-            (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}",start,end,User.UserId);
+            (AppointmentsGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}", start, end, User.UserId);
+
         }
 
         private void ButtonMonth_Click(object sender, EventArgs e)
@@ -195,13 +197,15 @@ namespace Appointment_Manager
             UpdateAppointments();
             DateTime start = DateTime.UtcNow.AddDays(1 - DateTime.UtcNow.Day);
             DateTime end = DateTime.UtcNow.AddDays(DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month) - DateTime.UtcNow.Day);
-            (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}", start, end,User.UserId);
+            (AppointmentsGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}", start, end,User.UserId);
         }
 
         private void ButtonCust_Click(object sender, EventArgs e)
         {
             //  Open Customer form.
-            if (Customer == null || Customer.IsDisposed)
+            if (Customer?.IsDisposed != false)
             {
                 Customer = new Customers(this);
                 Customer.Show();
@@ -215,7 +219,7 @@ namespace Appointment_Manager
         private void ButtonApt_Click(object sender, EventArgs e)
         {
             //  Open Appointment form.
-            if (Aptmnts == null || Aptmnts.IsDisposed)
+            if (Aptmnts?.IsDisposed != false)
             {
                 Aptmnts = new Appointments(this);
                 Aptmnts.Show();
@@ -226,14 +230,14 @@ namespace Appointment_Manager
             }
         }
 
-        private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void AppointmentsGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            AppointmentsGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         private void ButtonMonthly_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = null;
+            AppointmentsGridView.DataSource = null;
             DataTable dataTable = new DataTable();
             Connection CNObject = new Connection();
             CNObject.CreateConnection();
@@ -243,20 +247,20 @@ namespace Appointment_Manager
             rdr.Fill(dataTable);
             rdr.Dispose();
             CNObject.ConnectionClose();
-            dataGridView1.DataSource = dataTable;
+            AppointmentsGridView.DataSource = dataTable;
         }
 
         private void ButtonConsult_Click(object sender, EventArgs e)
         {
             DBObject.LoadAppointments();
             UpdateAppointments();
-            (dataGridView1.DataSource as DataTable).DefaultView.RowFilter = null;
-            (dataGridView1.DataSource as DataTable).DefaultView.Sort = "User Name ASC,Start ASC";
+            (AppointmentsGridView.DataSource as DataTable).DefaultView.RowFilter = null;
+            (AppointmentsGridView.DataSource as DataTable).DefaultView.Sort = "User Name ASC,Start ASC";
         }
 
         private void ButtonCusts_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = null;
+            AppointmentsGridView.DataSource = null;
             DataTable dataTable = new DataTable();
             Connection CNObject = new Connection();
             CNObject.CreateConnection();
@@ -266,13 +270,13 @@ namespace Appointment_Manager
             rdr.Fill(dataTable);
             rdr.Dispose();
             CNObject.ConnectionClose();
-            dataGridView1.DataSource = dataTable;
+            AppointmentsGridView.DataSource = dataTable;
         }
 
         private void ButtonSearch_Click(object sender, EventArgs e)
         {
             //  Open Appointment form.
-            if (Search == null || Search.IsDisposed)
+            if (Search?.IsDisposed != false)
             {
                 Search = new Search(this);
                 Search.Show();

@@ -5,7 +5,7 @@ namespace Appointment_Manager
 {
     class FileLog
     {
-        private static readonly string logname = "userlog.txt";
+        private const string logname = "userlog.txt";
 
         public void Log(bool status, string user)
         {

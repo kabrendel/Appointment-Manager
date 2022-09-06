@@ -14,18 +14,18 @@ namespace Appointment_Manager
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
-		public Address(int addressId_, string address_, string address2_, int cityId_, string postalCode_, string phone_, DateTime createDate_, string createdBy_, DateTime lastUpdate_, string lastUpdateBy_)
+		public Address(int _addressId, string _address, string _address2, int _cityId, string _postalCode, string _phone, DateTime _createDate, string _createdBy, DateTime _lastUpdate, string _lastUpdateBy)
 		{
-			this.AddressId = addressId_;
-			this.Address1 = address_;
-			this.Address2 = address2_;
-			this.CityId = cityId_;
-			this.PostalCode = postalCode_;
-			this.Phone = phone_;
-			this.CreateDate = createDate_;
-			this.CreatedBy = createdBy_;
-			this.LastUpdate = lastUpdate_;
-			this.LastUpdateBy = lastUpdateBy_;
+			AddressId = _addressId;
+			Address1 = _address;
+			Address2 = _address2;
+			CityId = _cityId;
+			PostalCode = _postalCode;
+			Phone = _phone;
+			CreateDate = _createDate;
+			CreatedBy = _createdBy;
+			LastUpdate = _lastUpdate;
+			LastUpdateBy = _lastUpdateBy;
 		}
 	}
 }

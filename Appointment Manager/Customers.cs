@@ -8,19 +8,20 @@ namespace Appointment_Manager
     public partial class Customers : Form
     {
         readonly Main main;
-        List<TextBox> TextBoxes;
+        //  Collection for data check.
+        readonly List<TextBox> TextBoxes;
         public Customers(Main main)
         {
             InitializeComponent();
-            //  Collection for data check.
-            TextBoxes = new List<TextBox>();
-            TextBoxes.Add(textName);
-            TextBoxes.Add(textAdd1);
-            //TextBoxes.Add(textAdd2);  //  Left off, Add2 is generally optional.
-            TextBoxes.Add(textCity);
-            TextBoxes.Add(textPostal);
-            TextBoxes.Add(textCountry);
-            TextBoxes.Add(textPhone);
+            TextBoxes = new List<TextBox>
+            {
+                textName,
+                textAdd1,
+                textCity,
+                textPostal,
+                textCountry,
+                textPhone
+            };
             this.main = main;
             Location = main.Location;
         }
@@ -33,12 +34,12 @@ namespace Appointment_Manager
 
         private void Customers_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
+            CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
             //  Hide Id columns.
-            dataGridView1.Columns[0].Visible = false;
-            dataGridView1.Columns[2].Visible = false;
-            dataGridView1.Columns[6].Visible = false;
-            dataGridView1.Columns[8].Visible = false;
+            CustomerGridView.Columns[0].Visible = false;
+            CustomerGridView.Columns[2].Visible = false;
+            CustomerGridView.Columns[6].Visible = false;
+            CustomerGridView.Columns[8].Visible = false;
         }
 
         private void ButtonAdd_Click(object sender, EventArgs e)
@@ -49,7 +50,7 @@ namespace Appointment_Manager
                 return;
             }
             if (main.SQLFunctions.AddCustomer(
-                int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString()),
+                int.Parse(CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex].Cells[0].Value.ToString()),
                 textName.Text,
                 textAdd1.Text,
                 textAdd2.Text,
@@ -61,8 +62,7 @@ namespace Appointment_Manager
             {
                 //  true
                 MessageBox.Show("Customer add success.", this.Text);
-                //  Refresh DataSource.
-                dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
+                CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
             }
             else
             {
@@ -73,7 +73,7 @@ namespace Appointment_Manager
 
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {
-            DataGridViewRow row = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex];
+            DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
             if (row.Cells["Customer Name"].Value.ToString() == "New Customer")
             {
                 //  No cell selected or column header selected.
@@ -101,8 +101,7 @@ namespace Appointment_Manager
             {
                 //  true
                 MessageBox.Show("Customer updated successfully.", this.Text);
-                //  Refresh DataSource.
-                dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
+                CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
             }
             else
             {
@@ -116,7 +115,7 @@ namespace Appointment_Manager
             var confirmDelete = MessageBox.Show("Are you sure you want to delete this customer?", this.Text, MessageBoxButtons.OKCancel);
             if (confirmDelete == DialogResult.OK)
             {
-                DataGridViewRow row = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex];
+                DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
                 if (row.Cells["Customer Name"].Value.ToString() == "New Customer")
                 {
                     //  No cell selected or column header selected.
@@ -133,7 +132,7 @@ namespace Appointment_Manager
                     if (main.SQLFunctions.DeleteCustomer(cust, addr, city, cntry))
                     {
                         MessageBox.Show("Customer successfully deleted.", this.Text);
-                        dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
+                        CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
                     }
                     else
                     {
@@ -149,7 +148,7 @@ namespace Appointment_Manager
 
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
-            if ((dataGridView1.CurrentCell == null) || (dataGridView1.CurrentCell.RowIndex <= -1))
+            if ((CustomerGridView.CurrentCell == null) || (CustomerGridView.CurrentCell.RowIndex <= -1))
             {
                 //  No cell selected or column header selected.
                 return;
@@ -157,7 +156,7 @@ namespace Appointment_Manager
             else
             {
                 //  Update text boxes to selected data row.
-                DataGridViewRow row = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex];
+                DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
                 textName.Text = row.Cells["Customer Name"].Value.ToString();
                 textAdd1.Text = row.Cells["Address1"].Value.ToString();
                 textAdd2.Text = row.Cells["Address2"].Value.ToString();
@@ -193,7 +192,7 @@ namespace Appointment_Manager
 
         private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            CustomerGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
     }
 }
