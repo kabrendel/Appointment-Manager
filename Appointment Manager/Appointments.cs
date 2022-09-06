@@ -84,7 +84,7 @@ namespace Appointment_Manager
                         }
                     }
                 }
-                if (main.CreateAppointment(aCustomer, aUser, aType, startDate, endDate))
+                if (main.SQLFunctions.CreateAppointment(aCustomer, aUser, aType, startDate, endDate))
                 {
                     //  success
                     MessageBox.Show("Appointment created.", this.Text);
@@ -131,7 +131,7 @@ namespace Appointment_Manager
                         }
                     }
                 }
-                if (main.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()),aCustomer, aUser, aType, startDate, endDate))
+                if (main.SQLFunctions.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()),aCustomer, aUser, aType, startDate, endDate))
                 {
                     //  success
                     MessageBox.Show("Appointment updated.", this.Text);
@@ -158,7 +158,7 @@ namespace Appointment_Manager
             {
                 DataGridViewRow row = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex];
                 //  mainDeleteAppointment appointment id, customer id, userid
-                if (main.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
+                if (main.SQLFunctions.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
                 {
                     MessageBox.Show("Appointment deleted.", this.Text);
                     main.DBObject.LoadAppointments(main.User.UserId);

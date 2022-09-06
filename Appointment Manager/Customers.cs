@@ -48,7 +48,7 @@ namespace Appointment_Manager
                 MessageBox.Show("Error with customer fields, double check entries.",this.Text);
                 return;
             }
-            if (main.AddCustomer(
+            if (main.SQLFunctions.AddCustomer(
                 int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString()),
                 textName.Text,
                 textAdd1.Text,
@@ -85,7 +85,7 @@ namespace Appointment_Manager
                 MessageBox.Show("Error with customer fields, double check entries.", this.Text);
                 return;
             }
-            if (main.UpdateCustomer(
+            if (main.SQLFunctions.UpdateCustomer(
                 int.Parse(row.Cells["Customer Id"].Value.ToString()),
                 int.Parse(row.Cells["Address Id"].Value.ToString()),
                 int.Parse(row.Cells["City Id"].Value.ToString()),
@@ -130,7 +130,7 @@ namespace Appointment_Manager
                     int addr = int.Parse(row.Cells["Address Id"].Value.ToString());
                     int city = int.Parse(row.Cells["City Id"].Value.ToString());
                     int cntry = int.Parse(row.Cells["Country Id"].Value.ToString());
-                    if (main.DeleteCustomer(cust, addr, city, cntry))
+                    if (main.SQLFunctions.DeleteCustomer(cust, addr, city, cntry))
                     {
                         MessageBox.Show("Customer successfully deleted.", this.Text);
                         dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
