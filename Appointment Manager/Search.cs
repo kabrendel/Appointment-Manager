@@ -25,17 +25,17 @@ namespace Appointment_Manager
             Customer = new DataTable();
             User = new DataTable();
             //  Loast list of types from data.
-            Type = main.TypeList();
+            Type = main.DTBuilder.TypeList();
             cmbType.DataSource = Type;
             cmbType.SelectedIndex = -1;
             //  Load list of customer's from data.
-            Customer = main.CustomerList();
+            Customer = main.DTBuilder.CustomerList();
             cmbCust.DisplayMember = "Name";
             cmbCust.ValueMember = "ID";
             cmbCust.DataSource = Customer;
             cmbCust.SelectedIndex = -1;
             //  Load user list from data.
-            User = main.UserList(true);
+            User = main.DTBuilder.UserList(true);
             cmbUser.DisplayMember = "Name";
             cmbUser.ValueMember = "ID";
             cmbUser.DataSource = User;
@@ -54,7 +54,7 @@ namespace Appointment_Manager
             dateTimePicker1.Value = dateTimePicker1.MinDate;
             dateTimePicker2.Value = dateTimePicker2.MaxDate;
             main.DBObject.LoadAppointments();
-            dataGridView1.DataSource = main.BuildAppointmentTable();
+            dataGridView1.DataSource = main.DTBuilder.BuildAppointmentTable();
             dataGridView1.Columns[0].Visible = false;
             dataGridView1.Columns[2].Visible = false;
             dataGridView1.Columns[4].Visible = false;
@@ -180,7 +180,7 @@ namespace Appointment_Manager
 
             DateTime startDate = dateTimePicker1.Value.Date + TimeSpan.Parse(cmbStartTime.SelectedValue.ToString());
             DateTime endDate = dateTimePicker2.Value.Date + TimeSpan.Parse(cmbEndTime.SelectedValue.ToString());
-            
+
             filters.Add(String.Format("[Start] >= #{0}# AND [END] <= #{1}#", startDate, endDate));
 
             StringBuilder finalfilter = new StringBuilder();

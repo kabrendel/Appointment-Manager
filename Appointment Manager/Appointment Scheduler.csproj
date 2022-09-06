@@ -113,6 +113,7 @@
     <Compile Include="Customers.Designer.cs">
       <DependentUpon>Customers.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataTables.cs" />
     <Compile Include="DBObjects.cs" />
     <Compile Include="FileLog.cs" />
     <Compile Include="Login.cs">

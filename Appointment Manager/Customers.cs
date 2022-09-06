@@ -33,7 +33,7 @@ namespace Appointment_Manager
 
         private void Customers_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = main.BuildCustomerTable();
+            dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
             //  Hide Id columns.
             dataGridView1.Columns[0].Visible = false;
             dataGridView1.Columns[2].Visible = false;
@@ -62,7 +62,7 @@ namespace Appointment_Manager
                 //  true
                 MessageBox.Show("Customer add success.", this.Text);
                 //  Refresh DataSource.
-                dataGridView1.DataSource = main.BuildCustomerTable();
+                dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
             }
             else
             {
@@ -102,7 +102,7 @@ namespace Appointment_Manager
                 //  true
                 MessageBox.Show("Customer updated successfully.", this.Text);
                 //  Refresh DataSource.
-                dataGridView1.DataSource = main.BuildCustomerTable();
+                dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
             }
             else
             {
@@ -133,7 +133,7 @@ namespace Appointment_Manager
                     if (main.DeleteCustomer(cust, addr, city, cntry))
                     {
                         MessageBox.Show("Customer successfully deleted.", this.Text);
-                        dataGridView1.DataSource = main.BuildCustomerTable();
+                        dataGridView1.DataSource = main.DTBuilder.BuildCustomerTable();
                     }
                     else
                     {

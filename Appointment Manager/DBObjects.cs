@@ -15,14 +15,6 @@ namespace Appointment_Manager
         public BindingList<Customer> Customers { get; private set; }
         public BindingList<User> Users { get; private set; }
         //
-        //  Index of next table rows.
-        //  to be phased out soon.
-        private int customerIndex;
-        private int addressIndex;
-        private int cityIndex;
-        private int countryIndex;
-        private int appointmentIndex;
-        //
         public DBObjects()
         {
             //  Initialize collection lists.
@@ -111,9 +103,8 @@ namespace Appointment_Manager
             rdr.Close();
             //  --------------------------------------------------------
             CNObject.ConnectionClose();
-            UpdateIndex();
         }
-        private void NewAddr(MySqlDataReader rdr)
+        public void NewAddr(MySqlDataReader rdr)
         {
             Address temp = new Address
             (
@@ -130,12 +121,12 @@ namespace Appointment_Manager
             );
             Addresses.Add(temp);
         }
-        private void NewAddr(int addrId, string ad1, string ad2, int cityId, string postal, string phone, DateTime date, string user, DateTime date1, string user1)
+        public void NewAddr(int addrId, string ad1, string ad2, int cityId, string postal, string phone, DateTime date, string user, DateTime date1, string user1)
         {
             Address temp = new Address(addrId, ad1, ad2, cityId, postal, phone, date, user, date1, user1);
             Addresses.Add(temp);
         }
-        private void NewCity(MySqlDataReader rdr)
+        public void NewCity(MySqlDataReader rdr)
         {
             City temp = new City
             (
@@ -150,13 +141,13 @@ namespace Appointment_Manager
             Cities.Add(temp);
         }
 
-        private void NewCity(int cityId, string city, int countryId, DateTime date, string user, DateTime date1, string user1)
+        public void NewCity(int cityId, string city, int countryId, DateTime date, string user, DateTime date1, string user1)
         {
             City temp = new City(cityId, city, countryId, date, user, date1, user1);
             Cities.Add(temp);
         }
 
-        private void NewCountry(MySqlDataReader rdr)
+        public void NewCountry(MySqlDataReader rdr)
         {
             Country temp = new Country
             (
@@ -170,13 +161,13 @@ namespace Appointment_Manager
             Countries.Add(temp);
         }
 
-        private void NewCountry(int countryId, string country, DateTime date, string user, DateTime date1, string user1)
+        public void NewCountry(int countryId, string country, DateTime date, string user, DateTime date1, string user1)
         {
             Country temp = new Country(countryId, country, date, user, date1, user1);
             Countries.Add(temp);
         }
 
-        private void NewCustomer(MySqlDataReader rdr)
+        public void NewCustomer(MySqlDataReader rdr)
         {
             Customer temp = new Customer
             (
@@ -192,7 +183,7 @@ namespace Appointment_Manager
             Customers.Add(temp);
         }
 
-        private void NewCustomer(int customerId, string name, int addrId, bool active, DateTime date, string user, DateTime date1, string user1)
+        public void NewCustomer(int customerId, string name, int addrId, bool active, DateTime date, string user, DateTime date1, string user1)
         {
             Customer temp = new Customer(customerId, name, addrId, active, date, user, date1, user1);
             Customers.Add(temp);
@@ -232,7 +223,7 @@ namespace Appointment_Manager
             rdr.Close();
             CNObject.ConnectionClose();
         }
-        private void NewAppointment(MySqlDataReader rdr)
+        public void NewAppointment(MySqlDataReader rdr)
         {
             Appointment temp = new Appointment
             (
@@ -255,59 +246,11 @@ namespace Appointment_Manager
             Appointments.Add(temp);
         }
 
-        private void NewAppointment(int apptId, int custId, int userId, string title, string desc, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime date, string user, DateTime date1, string user1)
+        public void NewAppointment(int apptId, int custId, int userId, string title, string desc, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime date, string user, DateTime date1, string user1)
         {
             Appointment temp = new Appointment(apptId, custId, userId, title, desc, location, contact, type, url, start, end, date, user, date1, user1);
             Appointments.Add(temp);
         }
         #endregion
-        private void UpdateIndex()
-        {
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            //  --------------------------------------------------------
-            string sqlString = "SELECT MAX(customerId) from customer";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                customerIndex = int.Parse(rdr[0].ToString()) + 1;
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT MAX(addressId) from address";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                addressIndex = int.Parse(rdr[0].ToString()) + 1;
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT MAX(cityId) from city";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                cityIndex = int.Parse(rdr[0].ToString()) + 1;
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT MAX(countryId) from country";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                countryIndex = int.Parse(rdr[0].ToString()) + 1;
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT MAX(appointmentId) from appointment";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                appointmentIndex = int.Parse(rdr[0].ToString()) + 1;
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            CNObject.ConnectionClose();
-        }
     }//  End of Class
 }
