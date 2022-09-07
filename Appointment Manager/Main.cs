@@ -47,7 +47,9 @@ namespace Appointment_Manager
             AppointmentsGridView.Columns[0].Visible = false;
             AppointmentsGridView.Columns[2].Visible = false;
             AppointmentsGridView.Columns[4].Visible = false;
-            (AppointmentsGridView.DataSource as DataTable).DefaultView.RowFilter = String.Format("[User Id] = {0}", User.UserId);
+            (AppointmentsGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = String.Format("[User Id] = {0}", User.UserId);
         }
 
         public string[] UserLogin(string user, string pass)

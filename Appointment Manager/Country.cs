@@ -10,14 +10,14 @@ namespace Appointment_Manager
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
-		public Country(int _countryId, string _country, DateTime _createDate, string _createdBy, DateTime _lastUpdate, string _lastUpdateBy)
+		public Country(int countryId, string country, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.CountryId = _countryId;
-			this.ACountry = _country;
-			this.CreateDate = _createDate;
-			this.CreatedBy = _createdBy;
-			this.LastUpdate = _lastUpdate;
-			this.LastUpdateBy = _lastUpdateBy;
+			this.CountryId = countryId;
+			this.ACountry = country;
+			this.CreateDate = createDate;
+			this.CreatedBy = createdBy;
+			this.LastUpdate = lastUpdate;
+			this.LastUpdateBy = lastUpdateBy;
 		}
 	}
 }

@@ -19,23 +19,23 @@ namespace Appointment_Manager
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
-		public Appointment(int _appointmentId, int _customerId, int _userId, string _title, string _description, string _location, string _contact, string _type, string _url, DateTime _start, DateTime _end, DateTime _createDate, string _createdBy, DateTime _lastUpdate, string _lastUpdateBy)
+		public Appointment(int appointmentId, int customerId, int userId, string title, string description, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.AppointmentId = _appointmentId;
-			this.CustomerId = _customerId;
-			this.UserId = _userId;
-			this.Title = _title;
-			this.Description = _description;
-			this.Location = _location;
-			this.Contact = _contact;
-			this.Type = _type;
-			this.Url = _url;
-			this.Start = _start;
-			this.End = _end;
-			this.CreateDate = _createDate;
-			this.CreatedBy = _createdBy;
-			this.LastUpdate = _lastUpdate;
-			this.LastUpdateBy = _lastUpdateBy;
+			this.AppointmentId = appointmentId;
+			this.CustomerId = customerId;
+			this.UserId = userId;
+			this.Title = title;
+			this.Description = description;
+			this.Location = location;
+			this.Contact = contact;
+			this.Type = type;
+			this.Url = url;
+			this.Start = start;
+			this.End = end;
+			this.CreateDate = createDate;
+			this.CreatedBy = createdBy;
+			this.LastUpdate = lastUpdate;
+			this.LastUpdateBy = lastUpdateBy;
 		}
 	}
 }
