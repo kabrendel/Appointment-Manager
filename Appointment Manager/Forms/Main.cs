@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace Appointment_Manager
 {
@@ -17,7 +16,9 @@ namespace Appointment_Manager
         //  Objects for methods.
         public DBObjects DBObject;
         public DataTables DTBuilder;
-        public SQLQueries SQLFunctions;
+        public SQLQueries SQLFunctions; //  shouldn't be in main but used by other winforms
+        //
+        public Repository Repo;
         //
         public Main()
         {
@@ -25,8 +26,9 @@ namespace Appointment_Manager
             DBObject = new DBObjects();
             DBObject.LoadUsers();
             DBObject.LoadCustomers();
-            DTBuilder = new DataTables(this,DBObject);
+            DTBuilder = new DataTables(this, DBObject);
             SQLFunctions = new SQLQueries(this, DBObject);
+            Repo = new Repository();
         }
         private void Main_Load(object sender, EventArgs e)
         {
@@ -39,64 +41,42 @@ namespace Appointment_Manager
                 UpdateAppointments();
             }
         }
+        private void UserNotifications()
+        {
+            foreach (Appointment a in DBObject.Appointments)
+            {
+                if (a.UserId == User.UserId)
+                {
+                    if ((a.Start > DateTime.UtcNow) && (a.Start <= DateTime.UtcNow.AddMinutes(15)))
+                    {
+                        MessageBox.Show(User.UserName + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
+                        break;
+                    }
+                }
+            }
+        }
         public void UpdateAppointments()
         {
-            //  rename? possibly move to DataTables
+            //  not sure I like this method.
             AppointmentsGridView.DataSource = null;
             AppointmentsGridView.DataSource = DTBuilder.BuildAppointmentTable();
             AppointmentsGridView.Columns[0].Visible = false;
             AppointmentsGridView.Columns[2].Visible = false;
             AppointmentsGridView.Columns[4].Visible = false;
-            (AppointmentsGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = String.Format("[User Id] = {0}", User.UserId);
         }
-
         public string[] UserLogin(string user, string pass)
         {
+            //  User object.
             if (User != null)
             {
                 // Reset user object created below.
                 User = null;
             }
-            //  Result to pass back to caller.
+            //  Result to pass back to Login form but this code should probably move to Login form out of Main.
             string[] results = new string[2];
-            //  Temporary store user password for comparison.
-            string userPass = null;
-            //  DB things
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            string sqlString = "SELECT password FROM user WHERE userName = @user";
-            MySqlCommand cmd = new MySqlCommand(sqlString, CNObject.connection);
-            cmd.Parameters.AddWithValue("@user", user);
-            try
-            {
-                MySqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    userPass = rdr[0].ToString();
-                }
-                rdr.Close();
-                sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user WHERE userName = @user";
-                cmd = new MySqlCommand(sqlString, CNObject.connection);
-                cmd.Parameters.AddWithValue("@user", user);
-                rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    User = DBObject.NewUser(rdr);
-                }
-                rdr.Close();
-                CNObject.ConnectionClose();
-            }
-            catch (Exception ex)
-            {
-                CNObject.ConnectionClose();
-                MessageBox.Show("Error retrieving user record from database: " + '\n'+ ex,this.Text);
-                results[0] = "False";
-                results[1] = "DB";
-                return results;
-            }
+            //  Temporarily store user password for comparison, only time we touch a password.
+            string userPass = Repo.UserPassword(user);
+            User = Repo.UserObject(user);
             if (User == null)
             {
                 results[0] = "False";
@@ -119,37 +99,82 @@ namespace Appointment_Manager
                 }
             }
         }
-
-        private void UserNotifications()
+        //  Events
+        private void AppointmentsGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            foreach (Appointment a in DBObject.Appointments)
+            AppointmentsGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+        //  Open new forms
+        private void ButtonCust_Click(object sender, EventArgs e)
+        {
+            //  Open Customer form.
+            if (Customer?.IsDisposed != false)
             {
-                if (a.UserId == User.UserId)
-                {
-                    if ((a.Start > DateTime.UtcNow) && (a.Start <= DateTime.UtcNow.AddMinutes(15)))
-                    {
-                        MessageBox.Show(User.UserName + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
-                        break;
-                    }
-                }
+                Customer = new Customers(this);
+                Customer.Show();
+            }
+            else
+            {
+                Customer.BringToFront();
             }
         }
-
-        private void ButtonExit_Click(object sender, EventArgs e)
+        private void ButtonApt_Click(object sender, EventArgs e)
         {
-            this.Dispose();
+            //  Open Appointment form.
+            if (Aptmnts?.IsDisposed != false)
+            {
+                Aptmnts = new Appointments(this);
+                Aptmnts.Show();
+            }
+            else
+            {
+                Aptmnts.BringToFront();
+            }
         }
-
-        private void ButtonAll_Click(object sender, EventArgs e)
+        private void ButtonSearch_Click(object sender, EventArgs e)
+        {
+            //  Open Search form.
+            if (Search?.IsDisposed != false)
+            {
+                Search = new Search(this);
+                Search.Show();
+            }
+            else
+            {
+                Search.BringToFront();
+            }
+        }
+        //  Buttons for "reports"
+        private void ButtonMonthly_Click(object sender, EventArgs e)
+        {
+            AppointmentsGridView.DataSource = Repo.MonthlyReport();
+        }
+        private void ButtonConsultants_Click(object sender, EventArgs e)
         {
             DBObject.LoadAppointments();
             UpdateAppointments();
+            (AppointmentsGridView.DataSource as DataTable)
+                .DefaultView
+                .RowFilter = null;
+            (AppointmentsGridView.DataSource as DataTable)
+                .DefaultView
+                .Sort = "User Name ASC,Start ASC";
         }
-
+        private void ButtonCustomers_Click(object sender, EventArgs e)
+        {
+            AppointmentsGridView.DataSource = Repo.CustomerReport();
+        }
+        //  Buttons for logged in user "reports".
+        private void ButtonAll_Click(object sender, EventArgs e)
+        {
+            //  Set DGV to all appointments for logged in user.
+            DBObject.LoadAppointments(User.UserId);
+            UpdateAppointments();
+        }
         private void ButtonWeek_Click(object sender, EventArgs e)
         {
             //  Set DGV to current weeks appointments.
-            DBObject.LoadAppointments();
+            DBObject.LoadAppointments(User.UserId);
             UpdateAppointments();
             DateTime start = DateTime.UtcNow;
             DateTime end = DateTime.UtcNow;
@@ -186,104 +211,22 @@ namespace Appointment_Manager
             }
             (AppointmentsGridView.DataSource as DataTable)
                 .DefaultView
-                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}", start, end, User.UserId);
+                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}'", start, end);
         }
-
         private void ButtonMonth_Click(object sender, EventArgs e)
         {
             //  Set DGV to current month.
-            DBObject.LoadAppointments();
+            DBObject.LoadAppointments(User.UserId);
             UpdateAppointments();
             DateTime start = DateTime.UtcNow.AddDays(1 - DateTime.UtcNow.Day);
             DateTime end = DateTime.UtcNow.AddDays(DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month) - DateTime.UtcNow.Day);
             (AppointmentsGridView.DataSource as DataTable)
                 .DefaultView
-                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}' AND [User Id] = {2}", start, end,User.UserId);
+                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}'", start, end);
         }
-
-        private void ButtonCust_Click(object sender, EventArgs e)
+        private void ButtonExit_Click(object sender, EventArgs e)
         {
-            //  Open Customer form.
-            if (Customer?.IsDisposed != false)
-            {
-                Customer = new Customers(this);
-                Customer.Show();
-            }
-            else
-            {
-                Customer.BringToFront();
-            }
-        }
-
-        private void ButtonApt_Click(object sender, EventArgs e)
-        {
-            //  Open Appointment form.
-            if (Aptmnts?.IsDisposed != false)
-            {
-                Aptmnts = new Appointments(this);
-                Aptmnts.Show();
-            }
-            else
-            {
-                Aptmnts.BringToFront();
-            }
-        }
-
-        private void AppointmentsGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            AppointmentsGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-        }
-
-        private void ButtonMonthly_Click(object sender, EventArgs e)
-        {
-            AppointmentsGridView.DataSource = null;
-            DataTable dataTable = new DataTable();
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            const string sql = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
-            MySqlDataAdapter rdr = CNObject.SQLAdapter(sql);
-            rdr.Fill(dataTable);
-            rdr.Dispose();
-            CNObject.ConnectionClose();
-            AppointmentsGridView.DataSource = dataTable;
-        }
-
-        private void ButtonConsult_Click(object sender, EventArgs e)
-        {
-            DBObject.LoadAppointments();
-            UpdateAppointments();
-            (AppointmentsGridView.DataSource as DataTable).DefaultView.RowFilter = null;
-            (AppointmentsGridView.DataSource as DataTable).DefaultView.Sort = "User Name ASC,Start ASC";
-        }
-
-        private void ButtonCusts_Click(object sender, EventArgs e)
-        {
-            AppointmentsGridView.DataSource = null;
-            DataTable dataTable = new DataTable();
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            const string sql = "Select customerName Customer, type Type,COUNT(*) Appointments from appointment join customer on appointment.customerId = customer.customerId GROUP BY Customer, Type";
-            MySqlDataAdapter rdr = CNObject.SQLAdapter(sql);
-            rdr.Fill(dataTable);
-            rdr.Dispose();
-            CNObject.ConnectionClose();
-            AppointmentsGridView.DataSource = dataTable;
-        }
-
-        private void ButtonSearch_Click(object sender, EventArgs e)
-        {
-            //  Open Appointment form.
-            if (Search?.IsDisposed != false)
-            {
-                Search = new Search(this);
-                Search.Show();
-            }
-            else
-            {
-                Search.BringToFront();
-            }
+            Dispose();
         }
     }//  End of Class
 }

@@ -72,8 +72,8 @@ namespace Appointment_Manager
             this.CustomerGridView.ShowEditingIcon = false;
             this.CustomerGridView.Size = new System.Drawing.Size(629, 227);
             this.CustomerGridView.TabIndex = 0;
-            this.CustomerGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DataGridView1_DataBindingComplete);
-            this.CustomerGridView.SelectionChanged += new System.EventHandler(this.DataGridView1_SelectionChanged);
+            this.CustomerGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.CustomerGridView_DataBindingComplete);
+            this.CustomerGridView.SelectionChanged += new System.EventHandler(this.CustomerGridView_SelectionChanged);
             // 
             // buttonAdd
             // 

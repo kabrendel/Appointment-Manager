@@ -1,7 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlTypes;
+using System.Windows.Forms;
 
 namespace Appointment_Manager
 {
@@ -28,17 +29,20 @@ namespace Appointment_Manager
         #region User object methods.
         public void LoadUsers()
         {
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
             const string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user;";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                Users.Add(NewUser(rdr));
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            Users.Add(NewUser(rdr));
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            CNObject.ConnectionClose();
         }
         public User NewUser(MySqlDataReader rdr)
         {
@@ -54,6 +58,58 @@ namespace Appointment_Manager
                     rdr[6].ToString()
                 );
         }
+        public string UserPassword(string user)
+        {
+            const string sqlString = "SELECT password FROM user WHERE userName = @user";
+            using (var connection2 = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    cmd.Parameters.AddWithValue("@user", user);
+                    try
+                    {
+                        using (MySqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                return _ = rdr[0].ToString();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving user record from database: " + '\n' + ex, "Appointment Manager");
+                    }
+                }
+            }
+            return null;
+        }
+        public User UserObject(string user)
+        {
+            const string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user WHERE userName = @user";
+            using (var connection2 = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    cmd.Parameters.AddWithValue("@user", user);
+                    try
+                    {
+                        using (MySqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                return NewUser(rdr);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving user record from database: " + '\n' + ex, "Appointment Manager");
+                    }
+                }
+            }
+            return null;
+        }
         #endregion
         #region Customer object methods.
         public void LoadCustomers()
@@ -66,43 +122,53 @@ namespace Appointment_Manager
                 Countries.Clear();
                 Customers.Clear();
             }
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            //  --------------------------------------------------------
-            String sqlString = "SELECT * FROM customer";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                NewCustomer(rdr);
+                String sqlString = "SELECT * FROM customer";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewCustomer(rdr);
+                        }
+                    }
+                }
+                sqlString = "SELECT * FROM address";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewAddr(rdr);
+                        }
+                    }
+                }
+                sqlString = "SELECT * FROM city";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewCity(rdr);
+                        }
+                    }
+                }
+                sqlString = "SELECT * FROM country";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewCountry(rdr);
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT * FROM address";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                NewAddr(rdr);
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT * FROM city";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                NewCity(rdr);
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            sqlString = "SELECT * FROM country";
-            rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
-            {
-                NewCountry(rdr);
-            }
-            rdr.Close();
-            //  --------------------------------------------------------
-            CNObject.ConnectionClose();
         }
         public void NewAddr(MySqlDataReader rdr)
         {
@@ -195,33 +261,39 @@ namespace Appointment_Manager
         {
             //  Clear current appointments and load all appointments..
             Appointments.Clear();
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            String sqlString = "SELECT * FROM appointment";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
+            const string sqlString = "SELECT * FROM appointment";
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                NewAppointment(rdr);
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewAppointment(rdr);
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            CNObject.ConnectionClose();
         }
         public void LoadAppointments(int UserId)
         {
             //  Clear current appointments and load logged in users appointments.
             Appointments.Clear();
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            String sqlString = "SELECT * FROM appointment where userId=" + UserId;
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
-            while (rdr.Read())
+            string sqlString = "SELECT * FROM appointment where userId=" + UserId;
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                NewAppointment(rdr);
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            NewAppointment(rdr);
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            CNObject.ConnectionClose();
         }
         public void NewAppointment(MySqlDataReader rdr)
         {

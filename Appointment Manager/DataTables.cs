@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Windows.Forms;
 
 namespace Appointment_Manager
 {
@@ -14,26 +15,33 @@ namespace Appointment_Manager
             this.main = main;
             DBObject = objects;
         }
+        public DataTables(DBObjects objects)
+        {
+            DBObject = objects;
+        }
         //  list builders
         public DataTable CustomerList()
         {
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            const string sqlString = "SELECT customerName,customerId FROM customer";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
-            while (rdr.Read())
+            const string sqlString = "SELECT customerName,customerId FROM customer";
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                DataRow row = dataTable.NewRow();
-                row["Name"] = rdr[0].ToString();
-                row["ID"] = int.Parse(rdr[1].ToString());
-                dataTable.Rows.Add(row);
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            DataRow row = dataTable.NewRow();
+                            row["Name"] = rdr[0].ToString();
+                            row["ID"] = int.Parse(rdr[1].ToString());
+                            dataTable.Rows.Add(row);
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            CNObject.ConnectionClose();
             return dataTable;
         }
         public List<string> TypeList()
@@ -48,23 +56,26 @@ namespace Appointment_Manager
         }
         public DataTable UserList(bool all)
         {
-            Connection CNObject = new Connection();
-            CNObject.CreateConnection();
-            CNObject.ConnectionOpen();
-            const string sqlString = "SELECT userName,userId FROM user";
-            MySqlDataReader rdr = CNObject.ExecuteQuery(sqlString);
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
-            while (rdr.Read())
+            const string sqlString = "SELECT userName,userId FROM user";
+            using (var connection2 = Connection.CreateAndOpen())
             {
-                DataRow row = dataTable.NewRow();
-                row["Name"] = rdr[0].ToString();
-                row["ID"] = int.Parse(rdr[1].ToString());
-                dataTable.Rows.Add(row);
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            DataRow row = dataTable.NewRow();
+                            row["Name"] = rdr[0].ToString();
+                            row["ID"] = int.Parse(rdr[1].ToString());
+                            dataTable.Rows.Add(row);
+                        }
+                    }
+                }
             }
-            rdr.Close();
-            CNObject.ConnectionClose();
             if (!all)
             {
                 //  Filter to just the logged in users appointments.
@@ -120,7 +131,6 @@ namespace Appointment_Manager
             dataTable.DefaultView.Sort = "Start ASC";
             return dataTable;
         }
-
 
         public DataTable BuildCustomerTable()
         {
@@ -190,5 +200,49 @@ namespace Appointment_Manager
             dataTable.DefaultView.Sort = "Customer Id ASC";
             return dataTable;
         }
-    }
+
+        public DataTable CustomerReport()
+        {
+            DataTable dt = new DataTable();
+            const string sqlString = "Select customerName Customer, type Type,COUNT(*) Appointments from appointment join customer on appointment.customerId = customer.customerId GROUP BY Customer, Type";
+            using (var connection2 = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    try
+                    {
+                        dt.Load(cmd.ExecuteReader());
+                        return dt;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving customer report: " + '\n' + ex, "Temp");
+                    }
+                }
+            }
+            return null;
+        }
+
+        public DataTable MonthlyReport()
+        {
+            DataTable dt = new DataTable();
+            const string sqlString = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
+            using (var connection2 = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    try
+                    {
+                        dt.Load(cmd.ExecuteReader());
+                        return dt;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving monthly report: " + '\n' + ex, "Temp");
+                    }
+                }
+            }
+            return null;
+        }
+    }//End of class
 }

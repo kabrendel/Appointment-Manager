@@ -25,13 +25,11 @@ namespace Appointment_Manager
             this.main = main;
             Location = main.Location;
         }
-
         private void ButtonExit_Click(object sender, EventArgs e)
         {
             main.UpdateAppointments();
             Dispose();
         }
-
         private void Customers_Load(object sender, EventArgs e)
         {
             CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
@@ -41,7 +39,6 @@ namespace Appointment_Manager
             CustomerGridView.Columns[6].Visible = false;
             CustomerGridView.Columns[8].Visible = false;
         }
-
         private void ButtonAdd_Click(object sender, EventArgs e)
         {
             if (!ValidateText())
@@ -70,7 +67,6 @@ namespace Appointment_Manager
                 MessageBox.Show("Customer add failed. Please make sure you have selected the 'New Customer' row.", this.Text);
             }
         }
-
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {
             DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
@@ -109,7 +105,6 @@ namespace Appointment_Manager
                 MessageBox.Show("Customer update failed.", this.Text);
             }
         }
-
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
             var confirmDelete = MessageBox.Show("Are you sure you want to delete this customer?", this.Text, MessageBoxButtons.OKCancel);
@@ -145,28 +140,6 @@ namespace Appointment_Manager
                 return;
             }
         }
-
-        private void DataGridView1_SelectionChanged(object sender, EventArgs e)
-        {
-            if ((CustomerGridView.CurrentCell == null) || (CustomerGridView.CurrentCell.RowIndex <= -1))
-            {
-                //  No cell selected or column header selected.
-                return;
-            }
-            else
-            {
-                //  Update text boxes to selected data row.
-                DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
-                textName.Text = row.Cells["Customer Name"].Value.ToString();
-                textAdd1.Text = row.Cells["Address1"].Value.ToString();
-                textAdd2.Text = row.Cells["Address2"].Value.ToString();
-                textCity.Text = row.Cells["City"].Value.ToString();
-                textPostal.Text = row.Cells["Postal Code"].Value.ToString();
-                textCountry.Text = row.Cells["Country"].Value.ToString();
-                textPhone.Text = row.Cells["Phone number"].Value.ToString();
-            }
-        }
-
         private bool ValidateText()
         {
             bool valid = true;
@@ -189,10 +162,29 @@ namespace Appointment_Manager
             }
             return valid;
         }
-
-        private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void CustomerGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             CustomerGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+        private void CustomerGridView_SelectionChanged(object sender, EventArgs e)
+        {
+            if ((CustomerGridView.CurrentCell == null) || (CustomerGridView.CurrentCell.RowIndex <= -1))
+            {
+                //  No cell selected or column header selected.
+                return;
+            }
+            else
+            {
+                //  Update text boxes to selected data row.
+                DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];
+                textName.Text = row.Cells["Customer Name"].Value.ToString();
+                textAdd1.Text = row.Cells["Address1"].Value.ToString();
+                textAdd2.Text = row.Cells["Address2"].Value.ToString();
+                textCity.Text = row.Cells["City"].Value.ToString();
+                textPostal.Text = row.Cells["Postal Code"].Value.ToString();
+                textCountry.Text = row.Cells["Country"].Value.ToString();
+                textPhone.Text = row.Cells["Phone number"].Value.ToString();
+            }
         }
     }
 }

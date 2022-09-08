@@ -89,6 +89,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connection.cs" />
     <Compile Include="Data\Address.cs" />
     <Compile Include="Data\Appointment.cs" />
     <Compile Include="Forms\Appointments.cs">
@@ -104,7 +105,6 @@
       <DependentUpon>AptmntD.cs</DependentUpon>
     </Compile>
     <Compile Include="Data\City.cs" />
-    <Compile Include="Connection.cs" />
     <Compile Include="Data\Country.cs" />
     <Compile Include="Data\Customer.cs" />
     <Compile Include="Forms\Customers.cs">
@@ -136,6 +136,7 @@
     <Compile Include="Forms\Search.Designer.cs">
       <DependentUpon>Search.cs</DependentUpon>
     </Compile>
+    <Compile Include="Repository.cs" />
     <Compile Include="SQLQueries.cs" />
     <Compile Include="Data\User.cs" />
     <EmbeddedResource Include="Forms\Appointments.resx">

@@ -1,72 +1,45 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Windows.Forms;
+﻿using System;
+using MySql.Data.MySqlClient;
 
 namespace Appointment_Manager
 {
-    internal class Connection
+    internal class Connection : IDisposable
     {
-        private readonly string windowText = "Appointment Manager";
         //  Strings for database.
         private const string server = "localhost";
         private const string database = "clientschedule";
         private const string uid = "Student";
         private const string pass = "student";
         //  Connection string.
-        private const string connectionString = "server=" + Appointment_Manager.Connection.server + ";userid=" + Appointment_Manager.Connection.uid + ";" +
-            "password=" + Appointment_Manager.Connection.pass + ";database=" + Appointment_Manager.Connection.database + ";";
+        private const string connectionString = "server=" + server + ";userid=" + uid + ";" +
+            "password=" + pass + ";database=" + database + ";";
+        private bool disposed = false;
         //
-        public MySqlConnection connection { get; private set; }
+        private Connection() { }
 
-        //
-        public void CreateConnection()
+        public static MySqlConnection CreateAndOpen()
         {
-            //  Try connecting to database.  Return a connection or show error message.
-            connection = new MySqlConnection(connectionString);
-            try
+            var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            return connection;
+        }
+        //  Disposal
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!this.disposed)
             {
-                connection.Open();
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can not create connection to database: " + '\n' + ex, windowText);
+                if (disposing)
+                {
+                    //??
+                }
+                disposed = true;
             }
         }
-        public void ConnectionOpen()
-        {
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can not open connection to database: " + '\n' + ex, windowText);
-            }
-        }
-        public void ConnectionClose()
-        {
-            try
-            {
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can not close connection to database: " + '\n' + ex, windowText);
-            }
-        }
-        public MySqlDataReader ExecuteQuery(string sqlString)
-        {
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            return reader;
-        }
-
-        public MySqlDataAdapter SQLAdapter(string sqlString)
-        {
-            MySqlCommand cmd = new MySqlCommand(sqlString, connection);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-            return adapter;
-        }
-    }// End of class
+        //  End of class
+    }
 }

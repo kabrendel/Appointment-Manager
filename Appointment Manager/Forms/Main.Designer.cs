@@ -133,7 +133,7 @@
             this.buttonConsult.TabIndex = 5;
             this.buttonConsult.Text = "Consultants";
             this.buttonConsult.UseVisualStyleBackColor = true;
-            this.buttonConsult.Click += new System.EventHandler(this.ButtonConsult_Click);
+            this.buttonConsult.Click += new System.EventHandler(this.ButtonConsultants_Click);
             // 
             // buttonMonthly
             // 
@@ -153,7 +153,7 @@
             this.buttonCusts.TabIndex = 6;
             this.buttonCusts.Text = "Customers";
             this.buttonCusts.UseVisualStyleBackColor = true;
-            this.buttonCusts.Click += new System.EventHandler(this.ButtonCusts_Click);
+            this.buttonCusts.Click += new System.EventHandler(this.ButtonCustomers_Click);
             // 
             // buttonExit
             // 
