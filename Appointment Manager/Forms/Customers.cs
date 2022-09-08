@@ -27,7 +27,7 @@ namespace Appointment_Manager
         }
         private void ButtonExit_Click(object sender, EventArgs e)
         {
-            main.UpdateAppointments();
+            main.UpdateAppointments(false);
             Dispose();
         }
         private void Customers_Load(object sender, EventArgs e)

@@ -32,8 +32,7 @@ namespace Appointment_Manager
             Type = new List<string>();
             Customer = new DataTable();
             User = new DataTable();
-            main.DBObject.LoadAppointments(main.User.UserId);
-            AppointmentGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+            AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
             AppointmentGridView.Columns[0].Visible = false;
             AppointmentGridView.Columns[2].Visible = false;
             AppointmentGridView.Columns[4].Visible = false;
@@ -53,8 +52,7 @@ namespace Appointment_Manager
 
         private void ButtonExit_Click(object sender, EventArgs e)
         {
-            main.DBObject.LoadAppointments(main.User.UserId);
-            main.UpdateAppointments();
+            main.UpdateAppointments(false);
             Dispose();
         }
 
@@ -89,8 +87,7 @@ namespace Appointment_Manager
                     //  Error message shown in method call.
                 }
                 //  reload appointments.
-                main.DBObject.LoadAppointments(main.User.UserId);
-                AppointmentGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+                AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
             }
             else
             {
@@ -134,8 +131,7 @@ namespace Appointment_Manager
                     //  Error message shown in method call.
                 }
                 //  reload appointments.
-                main.DBObject.LoadAppointments(main.User.UserId);
-                AppointmentGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+                AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
             }
             else
             {
@@ -152,8 +148,7 @@ namespace Appointment_Manager
                 if (main.SQLFunctions.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
                 {
                     MessageBox.Show("Appointment deleted.", this.Text);
-                    main.DBObject.LoadAppointments(main.User.UserId);
-                    AppointmentGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+                    AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
                 }
                 else
                 {

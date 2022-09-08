@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 
@@ -24,7 +25,6 @@ namespace Appointment_Manager
         {
             InitializeComponent();
             DBObject = new DBObjects();
-            DBObject.LoadUsers();
             DBObject.LoadCustomers();
             DTBuilder = new DataTables(this, DBObject);
             SQLFunctions = new SQLQueries(this, DBObject);
@@ -36,30 +36,33 @@ namespace Appointment_Manager
             var confirm = Login.ShowDialog();
             if (confirm == DialogResult.OK)
             {
-                DBObject.LoadAppointments(User.UserId);
                 UserNotifications();
-                UpdateAppointments();
+                UpdateAppointments(false);
             }
         }
         private void UserNotifications()
         {
-            foreach (Appointment a in DBObject.Appointments)
+            BindingList<Appointment> appointments = Repo.GetUserAppointments();
+            foreach (Appointment a in appointments)
             {
-                if (a.UserId == User.UserId)
+                if ((a.Start > DateTime.UtcNow) && (a.Start <= DateTime.UtcNow.AddMinutes(15)))
                 {
-                    if ((a.Start > DateTime.UtcNow) && (a.Start <= DateTime.UtcNow.AddMinutes(15)))
-                    {
-                        MessageBox.Show(User.UserName + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
-                        break;
-                    }
+                    MessageBox.Show(User.UserName + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
+                    break;
                 }
             }
         }
-        public void UpdateAppointments()
+        public void UpdateAppointments(bool all)
         {
-            //  not sure I like this method.
             AppointmentsGridView.DataSource = null;
-            AppointmentsGridView.DataSource = DTBuilder.BuildAppointmentTable();
+            if (all)
+            {
+                AppointmentsGridView.DataSource = Repo.GetAppointmentTableAll();
+            }
+            else
+            {
+                AppointmentsGridView.DataSource = Repo.GetAppointmentTable();
+            }
             AppointmentsGridView.Columns[0].Visible = false;
             AppointmentsGridView.Columns[2].Visible = false;
             AppointmentsGridView.Columns[4].Visible = false;
@@ -89,6 +92,7 @@ namespace Appointment_Manager
                 {
                     results[0] = "True";
                     results[1] = "Pass";
+                    Repo.SetUser(User);
                     return results;
                 }
                 else
@@ -151,8 +155,7 @@ namespace Appointment_Manager
         }
         private void ButtonConsultants_Click(object sender, EventArgs e)
         {
-            DBObject.LoadAppointments();
-            UpdateAppointments();
+            UpdateAppointments(true);
             (AppointmentsGridView.DataSource as DataTable)
                 .DefaultView
                 .RowFilter = null;
@@ -168,14 +171,12 @@ namespace Appointment_Manager
         private void ButtonAll_Click(object sender, EventArgs e)
         {
             //  Set DGV to all appointments for logged in user.
-            DBObject.LoadAppointments(User.UserId);
-            UpdateAppointments();
+            UpdateAppointments(false);
         }
         private void ButtonWeek_Click(object sender, EventArgs e)
         {
             //  Set DGV to current weeks appointments.
-            DBObject.LoadAppointments(User.UserId);
-            UpdateAppointments();
+            UpdateAppointments(false);
             DateTime start = DateTime.UtcNow;
             DateTime end = DateTime.UtcNow;
             switch (DateTime.UtcNow.DayOfWeek)
@@ -216,8 +217,7 @@ namespace Appointment_Manager
         private void ButtonMonth_Click(object sender, EventArgs e)
         {
             //  Set DGV to current month.
-            DBObject.LoadAppointments(User.UserId);
-            UpdateAppointments();
+            UpdateAppointments(false);
             DateTime start = DateTime.UtcNow.AddDays(1 - DateTime.UtcNow.Day);
             DateTime end = DateTime.UtcNow.AddDays(DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month) - DateTime.UtcNow.Day);
             (AppointmentsGridView.DataSource as DataTable)

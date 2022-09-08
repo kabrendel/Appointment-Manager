@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using System;
+using System.ComponentModel;
+using System.Data;
+using System.Windows.Forms;
 
 namespace Appointment_Manager
 {
@@ -7,31 +10,49 @@ namespace Appointment_Manager
         //  Repository class for domain layer
         //  repository should create a DBObjects object
         //  datatables??
-        private DBObjects dbObjects;
-        private DataTables dataTables;
+        private DBObjects _dbObjects;
+        private DataTables _dataTables;
+        private User _user;
         //  Constructor
         public Repository()
         {
-            dbObjects = new DBObjects();
-            dataTables = new DataTables(dbObjects);
+            _dbObjects = new DBObjects();
+            _dataTables = new DataTables(_dbObjects);
         }
         //
         public string UserPassword(string user)
         {
-            return dbObjects.UserPassword(user);
+            return _dbObjects.UserPassword(user);
         }
         public User UserObject(string user)
         {
-            return dbObjects.UserObject(user);
+            return _dbObjects.UserObject(user);
         }
         //
         public DataTable CustomerReport()
         {
-            return dataTables.CustomerReport();
+            return _dataTables.CustomerReport();
         }
         public DataTable MonthlyReport()
         {
-            return dataTables.MonthlyReport();
+            return _dataTables.MonthlyReport();
+        }
+        public DataTable GetAppointmentTable()
+        {
+            return _dataTables.BuildAppointmentTable(_dbObjects.GetAppointments(_user.UserId),_dbObjects.GetCustomers(),_dbObjects.GetUsers());
+        }
+        public DataTable GetAppointmentTableAll()
+        {
+            return _dataTables.BuildAppointmentTable(_dbObjects.GetAppointments(), _dbObjects.GetCustomers(), _dbObjects.GetUsers());
+        }
+        internal void SetUser(User user)
+        {
+            // replace later..
+            _user = user;
+        }
+        internal BindingList<Appointment> GetUserAppointments()
+        {
+            return _dbObjects.GetAppointments();
         }
         //
     }// End of class.

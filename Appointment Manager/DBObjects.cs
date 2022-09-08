@@ -10,39 +10,37 @@ namespace Appointment_Manager
     {
         //  Collections for database objects.
         public BindingList<Address> Addresses { get; }
-        public BindingList<Appointment> Appointments { get; }
         public BindingList<City> Cities { get;}
         public BindingList<Country> Countries { get;}
         public BindingList<Customer> Customers { get;}
-        public BindingList<User> Users { get;}
         //
         public DBObjects()
         {
             //  Initialize collection lists.
             Addresses = new BindingList<Address>();
-            Appointments = new BindingList<Appointment>();
             Cities = new BindingList<City>();
             Countries = new BindingList<Country>();
             Customers = new BindingList<Customer>();
-            Users = new BindingList<User>();
         }
         #region User object methods.
-        public void LoadUsers()
+        public BindingList<User> GetUsers()
         {
+            BindingList<User> users = new BindingList<User>();
             const string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user;";
-            using (var connection2 = Connection.CreateAndOpen())
+            using (var connection = Connection.CreateAndOpen())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
                     using (MySqlDataReader rdr = cmd.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
-                            Users.Add(NewUser(rdr));
+                            users.Add(NewUser(rdr));
                         }
                     }
                 }
             }
+            return users;
         }
         public User NewUser(MySqlDataReader rdr)
         {
@@ -112,6 +110,25 @@ namespace Appointment_Manager
         }
         #endregion
         #region Customer object methods.
+        public BindingList<Customer> GetCustomers()
+        {
+            BindingList<Customer> list = new BindingList<Customer>();
+            using (var connection = Connection.CreateAndOpen())
+            {
+                const string sqlString = "SELECT * FROM customer";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            list.Add(NewCustomerT(rdr));
+                        }
+                    }
+                }
+            }
+            return list;
+        }
         public void LoadCustomers()
         {
             //  Load customer or refresh collections for Customer screen.
@@ -249,6 +266,20 @@ namespace Appointment_Manager
             Customers.Add(temp);
         }
 
+        public Customer NewCustomerT(MySqlDataReader rdr)
+        {
+            return _ = new Customer
+            (
+                int.Parse(rdr[0].ToString()),
+                rdr[1].ToString(),
+                int.Parse(rdr[2].ToString()),
+                bool.Parse(rdr[3].ToString()),
+                DateTime.SpecifyKind((DateTime)rdr[4], DateTimeKind.Utc),
+                rdr[5].ToString(),
+                DateTime.SpecifyKind((DateTime)rdr[6], DateTimeKind.Utc),
+                rdr[7].ToString()
+            );
+        }
         public void NewCustomer(int customerId, string name, int addrId, bool active, DateTime date, string user, DateTime date1, string user1)
         {
             Customer temp = new Customer(customerId, name, addrId, active, date, user, date1, user1);
@@ -257,29 +288,10 @@ namespace Appointment_Manager
 
         #endregion
         #region Appointment object methods.
-        public void LoadAppointments()
+        public BindingList<Appointment> GetAppointments(int UserId)
         {
-            //  Clear current appointments and load all appointments..
-            Appointments.Clear();
-            const string sqlString = "SELECT * FROM appointment";
-            using (var connection2 = Connection.CreateAndOpen())
-            {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            NewAppointment(rdr);
-                        }
-                    }
-                }
-            }
-        }
-        public void LoadAppointments(int UserId)
-        {
-            //  Clear current appointments and load logged in users appointments.
-            Appointments.Clear();
+            //  Load appointments for logged in user.
+            BindingList<Appointment> list = new BindingList<Appointment>();
             string sqlString = "SELECT * FROM appointment where userId=" + UserId;
             using (var connection2 = Connection.CreateAndOpen())
             {
@@ -289,15 +301,36 @@ namespace Appointment_Manager
                     {
                         while (rdr.Read())
                         {
-                            NewAppointment(rdr);
+                            list.Add(NewAppointmentT(rdr));
                         }
                     }
                 }
             }
+            return list;
         }
-        public void NewAppointment(MySqlDataReader rdr)
+        public BindingList<Appointment> GetAppointments()
         {
-            Appointment temp = new Appointment
+            //  Load all appointments.
+            BindingList<Appointment> list = new BindingList<Appointment>();
+            const string sqlString = "SELECT * FROM appointment";
+            using (var connection = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            list.Add(NewAppointmentT(rdr));
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+        public Appointment NewAppointmentT(MySqlDataReader rdr)
+        {
+            return _ = new Appointment
             (
                 int.Parse(rdr[0].ToString()),
                 int.Parse(rdr[1].ToString()),
@@ -315,14 +348,13 @@ namespace Appointment_Manager
                 DateTime.SpecifyKind((DateTime)rdr[13], DateTimeKind.Utc),
                 rdr[14].ToString()
             );
-            Appointments.Add(temp);
         }
 
-        public void NewAppointment(int apptId, int custId, int userId, string title, string desc, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime date, string user, DateTime date1, string user1)
-        {
-            Appointment temp = new Appointment(apptId, custId, userId, title, desc, location, contact, type, url, start, end, date, user, date1, user1);
-            Appointments.Add(temp);
-        }
+        //public void NewAppointment(int apptId, int custId, int userId, string title, string desc, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime date, string user, DateTime date1, string user1)
+        //{
+        //    Appointment temp = new Appointment(apptId, custId, userId, title, desc, location, contact, type, url, start, end, date, user, date1, user1);
+        //    Appointments.Add(temp);
+        //}
         #endregion
     }//  End of Class
 }

@@ -79,8 +79,8 @@ namespace Appointment_Manager
                     try
                     {
                         cmd.ExecuteNonQuery();
-                        foreach (Appointment apt in DBObject.Appointments.Where(x => x.AppointmentId == appointmentId).ToList()) DBObject.Appointments.Remove(apt);
-                        DBObject.NewAppointment(appointmentId, customerId, userId, title, desc, location, contact, type, url, start, end, DateTime.UtcNow, main.User.UserName, DateTime.UtcNow, main.User.UserName);
+                        //foreach (Appointment apt in DBObject.Appointments.Where(x => x.AppointmentId == appointmentId).ToList()) DBObject.Appointments.Remove(apt);
+                        //DBObject.NewAppointment(appointmentId, customerId, userId, title, desc, location, contact, type, url, start, end, DateTime.UtcNow, main.User.UserName, DateTime.UtcNow, main.User.UserName);
                         return true;
                     }
                     catch (Exception ex)
@@ -103,7 +103,6 @@ namespace Appointment_Manager
                     try
                     {
                         cmd.ExecuteNonQuery();
-                        foreach (Appointment apt in DBObject.Appointments.Where(x => x.AppointmentId == appointmentId).ToList()) DBObject.Appointments.Remove(apt);
                         return true;
                     }
                     catch (Exception ex)
@@ -285,7 +284,6 @@ namespace Appointment_Manager
                             cmd = new MySqlCommand(delapts, connection2);
                             cmd.Parameters.AddWithValue("@cust", cust);
                             cmd.ExecuteNonQuery();
-                            foreach (Appointment apt in DBObject.Appointments.Where(x => x.CustomerId == cust).ToList()) DBObject.Appointments.Remove(apt);
                             //  remove customer
                             cmd = new MySqlCommand(custString, connection2);
                             cmd.Parameters.AddWithValue("@customerId", cust);

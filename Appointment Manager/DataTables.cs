@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 
@@ -84,9 +85,9 @@ namespace Appointment_Manager
             return dataTable;
         }
         // table builders
-        public DataTable BuildAppointmentTable()
+        public DataTable BuildAppointmentTable(BindingList<Appointment> apt,BindingList<Customer> cst,BindingList<User> usr)
         {
-            //  Build a DataTable to show appointments in Appointments form.
+
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("User Id", typeof(int));              //  User table.
             dataTable.Columns.Add("User Name", typeof(string));         //  User table.
@@ -99,7 +100,7 @@ namespace Appointment_Manager
             dataTable.Columns["Start"].DateTimeMode = DataSetDateTime.Local;
             dataTable.Columns.Add("End", typeof(DateTime));             //  Appointment table.
             dataTable.Columns["End"].DateTimeMode = DataSetDateTime.Local;
-            foreach (Appointment a in DBObject.Appointments)
+            foreach (Appointment a in apt)
             {
                 DataRow row = dataTable.NewRow();
                 row["Appointment Id"] = a.AppointmentId;
@@ -107,7 +108,7 @@ namespace Appointment_Manager
                 row["Start"] = a.Start;
                 row["End"] = a.End;
                 row["Type"] = a.Type;
-                foreach (Customer c in DBObject.Customers)
+                foreach (Customer c in cst)
                 {
                     if (a.CustomerId == c.CustomerId)
                     {
@@ -116,7 +117,7 @@ namespace Appointment_Manager
                         break;
                     }
                 }
-                foreach (User u in DBObject.Users)
+                foreach (User u in usr)
                 {
                     if (a.UserId == u.UserId)
                     {

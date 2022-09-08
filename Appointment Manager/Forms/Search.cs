@@ -53,8 +53,7 @@ namespace Appointment_Manager
             //
             dateTimePicker1.Value = dateTimePicker1.MinDate;
             dateTimePicker2.Value = dateTimePicker2.MaxDate;
-            main.DBObject.LoadAppointments();
-            SearchGridView.DataSource = main.DTBuilder.BuildAppointmentTable();
+            SearchGridView.DataSource = main.Repo.GetAppointmentTableAll();
             SearchGridView.Columns[0].Visible = false;
             SearchGridView.Columns[2].Visible = false;
             SearchGridView.Columns[4].Visible = false;
@@ -102,11 +101,7 @@ namespace Appointment_Manager
 
         private void CmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((SearchGridView.DataSource is null) || (cmbType.SelectedItem is null))
-            {
-                return;
-            }
-            else
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbType.SelectedItem is null)))
             {
                 SetDataFilter();
             }
@@ -114,11 +109,7 @@ namespace Appointment_Manager
 
         private void DateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
-            if (SearchGridView.DataSource is null)
-            {
-                return;
-            }
-            else
+            if (!(SearchGridView.DataSource is null))
             {
                 SetDataFilter();
             }
@@ -126,11 +117,7 @@ namespace Appointment_Manager
 
         private void DateTimePicker2_ValueChanged(object sender, EventArgs e)
         {
-            if (SearchGridView.DataSource is null)
-            {
-                return;
-            }
-            else
+            if (!(SearchGridView.DataSource is null))
             {
                 SetDataFilter();
             }
@@ -138,11 +125,7 @@ namespace Appointment_Manager
 
         private void CmbStartTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (SearchGridView.DataSource is null)
-            {
-                return;
-            }
-            else
+            if (!(SearchGridView.DataSource is null))
             {
                 SetDataFilter();
             }
@@ -150,17 +133,11 @@ namespace Appointment_Manager
 
         private void CmbEndTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (SearchGridView.DataSource is null)
-            {
-                return;
-            }
-            else
+            if (!(SearchGridView.DataSource is null))
             {
                 SetDataFilter();
             }
         }
-
-
         private void SetDataFilter()
         {
             List<string> filters = new List<string>();
