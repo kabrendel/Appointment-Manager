@@ -15,14 +15,14 @@ namespace Appointment_Scheduler
 		public User() { }
 		public User(int userId, string userName, string password, byte active, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.UserId = userId;
-			this.UserName = userName;
-			this.Password = password;
-			this.Active = active;
-			this.CreateDate = createDate;
-			this.CreatedBy = createdBy;
-			this.LastUpdate = lastUpdate;
-			this.LastUpdateBy = lastUpdateBy;
+			UserId = userId;
+			UserName = userName;
+			Password = password;
+			Active = active;
+			CreateDate = createDate;
+			CreatedBy = createdBy;
+			LastUpdate = lastUpdate;
+			LastUpdateBy = lastUpdateBy;
 		}
 	}
 }

@@ -6,7 +6,6 @@ namespace Appointment_Scheduler
     class FileLog
     {
         private const string logname = "userlog.txt";
-
         public void Log(bool status, string user)
         {
             LogExists();
@@ -28,7 +27,6 @@ namespace Appointment_Scheduler
                 }
             }
         }
-
         private void LogExists()
         {
             if (!File.Exists(logname))

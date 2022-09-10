@@ -21,21 +21,21 @@ namespace Appointment_Scheduler
 		public string LastUpdateBy { get; set; }
 		public Appointment(int appointmentId, int customerId, int userId, string title, string description, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.AppointmentId = appointmentId;
-			this.CustomerId = customerId;
-			this.UserId = userId;
-			this.Title = title;
-			this.Description = description;
-			this.Location = location;
-			this.Contact = contact;
-			this.Type = type;
-			this.Url = url;
-			this.Start = start;
-			this.End = end;
-			this.CreateDate = createDate;
-			this.CreatedBy = createdBy;
-			this.LastUpdate = lastUpdate;
-			this.LastUpdateBy = lastUpdateBy;
+			AppointmentId = appointmentId;
+			CustomerId = customerId;
+			UserId = userId;
+			Title = title;
+			Description = description;
+			Location = location;
+			Contact = contact;
+			Type = type;
+			Url = url;
+			Start = start;
+			End = end;
+			CreateDate = createDate;
+			CreatedBy = createdBy;
+			LastUpdate = lastUpdate;
+			LastUpdateBy = lastUpdateBy;
 		}
 	}
 }

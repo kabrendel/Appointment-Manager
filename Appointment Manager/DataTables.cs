@@ -110,7 +110,6 @@ namespace Appointment_Scheduler
         }
         public DataTable BuildCustomerTable()
         {
-            DBObjects db = new DBObjects();
             //  Build a DataTable to show customer data in Customer Form.
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Customer Id", typeof(int));          //  customer table.
@@ -124,12 +123,12 @@ namespace Appointment_Scheduler
             dataTable.Columns.Add("Country Id", typeof(string));        //  country table.
             dataTable.Columns.Add("Country", typeof(string));           //  country table.
             dataTable.Columns.Add("Phone Number", typeof(string));      //  address table.
-            foreach (Customer c in db.GetCustomers())
+            foreach (Customer c in DBObject.GetCustomers())
             {
                 DataRow row = dataTable.NewRow();
                 row["Customer Id"] = c.CustomerId;
                 row["Customer Name"] = c.CustomerName;
-                foreach (Address a in db.GetAddresses())
+                foreach (Address a in DBObject.GetAddresses())
                 {
                     if (a.AddressId == c.AddressId)
                     {
@@ -138,13 +137,13 @@ namespace Appointment_Scheduler
                         row["Address2"] = a.Address2;
                         row["Postal Code"] = a.PostalCode;
                         row["Phone Number"] = a.Phone;
-                        foreach (City i in db.GetCities())
+                        foreach (City i in DBObject.GetCities())
                         {
                             if (i.CityId == a.CityId)
                             {
                                 row["City Id"] = i.CityId;
                                 row["City"] = i.ACity;
-                                foreach (Country y in db.GetCountries())
+                                foreach (Country y in DBObject.GetCountries())
                                 {
                                     if (y.CountryId == i.CountryId)
                                     {

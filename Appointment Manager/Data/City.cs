@@ -13,13 +13,13 @@ namespace Appointment_Scheduler
 		public string LastUpdateBy { get; set; }
 		public City(int cityId, string city, int countryId, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.CityId = cityId;
-			this.ACity = city;
-			this.CountryId = countryId;
-			this.CreateDate = createDate;
-			this.CreatedBy = createdBy;
-			this.LastUpdate = lastUpdate;
-			this.LastUpdateBy = lastUpdateBy;
+			CityId = cityId;
+			ACity = city;
+			CountryId = countryId;
+			CreateDate = createDate;
+			CreatedBy = createdBy;
+			LastUpdate = lastUpdate;
+			LastUpdateBy = lastUpdateBy;
 		}
 	}
 }

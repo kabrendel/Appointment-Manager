@@ -12,12 +12,12 @@ namespace Appointment_Scheduler
 		public string LastUpdateBy { get; set; }
 		public Country(int countryId, string country, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.CountryId = countryId;
-			this.ACountry = country;
-			this.CreateDate = createDate;
-			this.CreatedBy = createdBy;
-			this.LastUpdate = lastUpdate;
-			this.LastUpdateBy = lastUpdateBy;
+			CountryId = countryId;
+			ACountry = country;
+			CreateDate = createDate;
+			CreatedBy = createdBy;
+			LastUpdate = lastUpdate;
+			LastUpdateBy = lastUpdateBy;
 		}
 	}
 }

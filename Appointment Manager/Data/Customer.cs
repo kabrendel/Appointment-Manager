@@ -15,14 +15,14 @@ namespace Appointment_Scheduler
         public Customer() { }
         public Customer(int customerId, string customerName, int addressId, bool active, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
-			this.CustomerId = customerId;
-			this.CustomerName = customerName;
-			this.AddressId = addressId;
-			this.Active = active;
-			this.CreateDate = createDate;
-			this.CreatedBy = createdBy;
-			this.LastUpdate = lastUpdate;
-			this.LastUpdateBy = lastUpdateBy;
+			CustomerId = customerId;
+			CustomerName = customerName;
+			AddressId = addressId;
+			Active = active;
+			CreateDate = createDate;
+			CreatedBy = createdBy;
+			LastUpdate = lastUpdate;
+			LastUpdateBy = lastUpdateBy;
 		}
 	}
 }
