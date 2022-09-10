@@ -89,7 +89,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connection.cs" />
     <Compile Include="Data\Address.cs" />
     <Compile Include="Data\Appointment.cs" />
     <Compile Include="Forms\Appointments.cs">

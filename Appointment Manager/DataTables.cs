@@ -1,9 +1,7 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Windows.Forms;
 
 namespace Appointment_Scheduler
 {
@@ -58,14 +56,14 @@ namespace Appointment_Scheduler
         }
         public DataTable BuildAppointmentTable(Tuple<bool,int> user)
         {
-            BindingList<Appointment> appointments = new BindingList<Appointment>();
+            BindingList<Appointment> appointments;
             if (user.Item1)
             {
-                appointments = DBObject.GetAppointments(user.Item2);
+                appointments = DBObject.GetAppointments();
             }
             else
             {
-                appointments = DBObject.GetAppointments();
+                appointments = DBObject.GetAppointments(user.Item2);
             }
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("User Id", typeof(int));              //  User table.
@@ -177,48 +175,6 @@ namespace Appointment_Scheduler
             dataTable.Rows.Add(blank);
             dataTable.DefaultView.Sort = "Customer Id ASC";
             return dataTable;
-        }
-        public DataTable CustomerReport()
-        {
-            DataTable dt = new DataTable();
-            const string sqlString = "Select customerName Customer, type Type,COUNT(*) Appointments from appointment join customer on appointment.customerId = customer.customerId GROUP BY Customer, Type";
-            using (var connection2 = Connection.CreateAndOpen())
-            {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    try
-                    {
-                        dt.Load(cmd.ExecuteReader());
-                        return dt;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error retrieving customer report: " + '\n' + ex, "Temp");
-                    }
-                }
-            }
-            return null;
-        }
-        public DataTable MonthlyReport()
-        {
-            DataTable dt = new DataTable();
-            const string sqlString = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
-            using (var connection2 = Connection.CreateAndOpen())
-            {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    try
-                    {
-                        dt.Load(cmd.ExecuteReader());
-                        return dt;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error retrieving monthly report: " + '\n' + ex, "Temp");
-                    }
-                }
-            }
-            return null;
         }
     }//End of class
 }

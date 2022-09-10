@@ -3,19 +3,25 @@ using System;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlTypes;
 using System.Windows.Forms;
 
 namespace Appointment_Scheduler
 {
     public class DBObjects
     {
+        private static readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
+        public static MySqlConnection CreateAndOpen()
+        {
+            var connection = new MySqlConnection(connectionString);
+            connection.Open();
+            return connection;
+        }
         #region User object methods.
         public BindingList<User> GetUsers()
         {
             BindingList<User> users = new BindingList<User>();
             const string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user;";
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -34,7 +40,7 @@ namespace Appointment_Scheduler
         {
             BindingList<User> list = new BindingList<User>();
             const string sqlString = "SELECT userName,userId FROM user";
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -71,9 +77,9 @@ namespace Appointment_Scheduler
         public User UserObject(string user)
         {
             const string sqlString = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM user WHERE userName = @user";
-            using (var connection2 = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
                     cmd.Parameters.AddWithValue("@user", user);
                     try
@@ -97,9 +103,9 @@ namespace Appointment_Scheduler
         public string UserPassword(string user)
         {
             const string sqlString = "SELECT password FROM user WHERE userName = @user";
-            using (var connection2 = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
                     cmd.Parameters.AddWithValue("@user", user);
                     try
@@ -125,7 +131,7 @@ namespace Appointment_Scheduler
         public BindingList<Address> GetAddresses()
         {
             BindingList<Address> list = new BindingList<Address>();
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 const string sqlString = "SELECT * FROM address";
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
@@ -144,7 +150,7 @@ namespace Appointment_Scheduler
         public BindingList<City> GetCities()
         {
             BindingList<City> list = new BindingList<City>();
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 const string sqlString = "SELECT * FROM city";
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
@@ -163,7 +169,7 @@ namespace Appointment_Scheduler
         public BindingList<Country> GetCountries()
         {
             BindingList<Country> list = new BindingList<Country>();
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 const string sqlString = "SELECT * FROM country";
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
@@ -182,7 +188,7 @@ namespace Appointment_Scheduler
         public BindingList<Customer> GetCustomers()
         {
             BindingList<Customer> list = new BindingList<Customer>();
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 const string sqlString = "SELECT * FROM customer";
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
@@ -202,7 +208,7 @@ namespace Appointment_Scheduler
         {
             BindingList<Customer> list = new BindingList<Customer>();
             const string sqlString = "SELECT customerName,customerId FROM customer";
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
             using (MySqlDataReader rdr = cmd.ExecuteReader())
             {
@@ -280,9 +286,9 @@ namespace Appointment_Scheduler
             //  Load appointments for logged in user.
             BindingList<Appointment> list = new BindingList<Appointment>();
             string sqlString = "SELECT * FROM appointment where userId=" + UserId;
-            using (var connection2 = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
                     using (MySqlDataReader rdr = cmd.ExecuteReader())
                     {
@@ -300,7 +306,7 @@ namespace Appointment_Scheduler
             //  Load all appointments.
             BindingList<Appointment> list = new BindingList<Appointment>();
             const string sqlString = "SELECT * FROM appointment";
-            using (var connection = Connection.CreateAndOpen())
+            using (var connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -335,6 +341,50 @@ namespace Appointment_Scheduler
                 DateTime.SpecifyKind((DateTime)rdr[13], DateTimeKind.Utc),
                 rdr[14].ToString()
             );
+        }
+        #endregion
+        #region Reports
+        public DataTable CustomerReport()
+        {
+            DataTable dt = new DataTable();
+            const string sqlString = "Select customerName Customer, type Type,COUNT(*) Appointments from appointment join customer on appointment.customerId = customer.customerId GROUP BY Customer, Type";
+            using (var connection = CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    try
+                    {
+                        dt.Load(cmd.ExecuteReader());
+                        return dt;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving customer report: " + '\n' + ex, "Temp");
+                    }
+                }
+            }
+            return null;
+        }
+        public DataTable MonthlyReport()
+        {
+            DataTable dt = new DataTable();
+            const string sqlString = "SELECT YEAR(START) Year,MONTHNAME(START) Month, type Type,COUNT(*) Count from appointment GROUP BY YEAR(START),MONTHNAME(START),TYPE";
+            using (var connection = CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    try
+                    {
+                        dt.Load(cmd.ExecuteReader());
+                        return dt;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving monthly report: " + '\n' + ex, "Temp");
+                    }
+                }
+            }
+            return null;
         }
         #endregion
     }//  End of Class

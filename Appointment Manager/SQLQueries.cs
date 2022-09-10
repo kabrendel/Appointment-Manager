@@ -10,18 +10,19 @@ namespace Appointment_Scheduler
         private readonly Repository Repo;
         private readonly string windowText = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
         private static readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
-        // constructor
+        //  Constructor
         public SQLQueries()
         {
             Repo = new Repository();
         }
-        //
+        //  Connection Method
         public static MySqlConnection CreateAndOpen()
         {
             var connection = new MySqlConnection(connectionString);
             connection.Open();
             return connection;
         }
+        //  Insert, Update, Delete, methods.
         public bool CreateAppointment(int customerId, int userId, string type, DateTime start, DateTime end)
         {
             const string title = "not needed";

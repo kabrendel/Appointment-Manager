@@ -29,20 +29,20 @@ namespace Appointment_Scheduler
         //
         public DataTable CustomerReport()
         {
-            return _dataTables.CustomerReport();
+            return _dbObjects.CustomerReport();
         }
         public DataTable MonthlyReport()
         {
-            return _dataTables.MonthlyReport();
+            return _dbObjects.MonthlyReport();
         }
         public DataTable GetAppointmentTable()
         {
-            Tuple<bool,int> user = new Tuple<bool,int>(false,User.UserId);
+            var user = Tuple.Create(false,User.UserId);
             return _dataTables.BuildAppointmentTable(user);
         }
         public DataTable GetAppointmentTableAll()
         {
-            Tuple<bool, int> user = new Tuple<bool, int>(true, User.UserId);
+            var user = Tuple.Create(true, 0);
             return _dataTables.BuildAppointmentTable(user);
         }
         public DataTable GetCustomerTable()
