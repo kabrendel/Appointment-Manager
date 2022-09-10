@@ -3,37 +3,26 @@ using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public partial class Main : Form
     {
-        //  Objects for Windows.
-        private Login Login;
-        private Customers Customer;
-        private Appointments Aptmnts;
-        private Search Search;
-        //  Logged in User object.
-        public User User;
-        //  Objects for methods.
-        public DBObjects DBObject;
-        public DataTables DTBuilder;
-        public SQLQueries SQLFunctions; //  shouldn't be in main but used by other winforms
-        //
-        public Repository Repo;
-        //
+        //  Objects for Winforms.
+        private Login LoginDialog;
+        private Customers CustomerForm;
+        private Appointments AppointmentForm;
+        private Search SearchForm;
+        //  Repository access object.
+        private readonly Repository Repo;
         public Main()
         {
             InitializeComponent();
-            DBObject = new DBObjects();
-            DBObject.LoadCustomers();
-            DTBuilder = new DataTables(this, DBObject);
-            SQLFunctions = new SQLQueries(this, DBObject);
             Repo = new Repository();
         }
         private void Main_Load(object sender, EventArgs e)
         {
-            Login = new Login(this);
-            var confirm = Login.ShowDialog();
+            LoginDialog = new Login(this);
+            var confirm = LoginDialog.ShowDialog();
             if (confirm == DialogResult.OK)
             {
                 UserNotifications();
@@ -47,14 +36,13 @@ namespace Appointment_Manager
             {
                 if ((a.Start > DateTime.UtcNow) && (a.Start <= DateTime.UtcNow.AddMinutes(15)))
                 {
-                    MessageBox.Show(User.UserName + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
+                    MessageBox.Show(Repo.GetUserName() + " has an appointment in the next " + a.Start.Subtract(DateTime.UtcNow).ToString("mm") + " minutes.", this.Text);
                     break;
                 }
             }
         }
         public void UpdateAppointments(bool all)
         {
-            AppointmentsGridView.DataSource = null;
             if (all)
             {
                 AppointmentsGridView.DataSource = Repo.GetAppointmentTableAll();
@@ -67,42 +55,6 @@ namespace Appointment_Manager
             AppointmentsGridView.Columns[2].Visible = false;
             AppointmentsGridView.Columns[4].Visible = false;
         }
-        public string[] UserLogin(string user, string pass)
-        {
-            //  User object.
-            if (User != null)
-            {
-                // Reset user object created below.
-                User = null;
-            }
-            //  Result to pass back to Login form but this code should probably move to Login form out of Main.
-            string[] results = new string[2];
-            //  Temporarily store user password for comparison, only time we touch a password.
-            string userPass = Repo.UserPassword(user);
-            User = Repo.UserObject(user);
-            if (User == null)
-            {
-                results[0] = "False";
-                results[1] = "User";
-                return results;
-            }
-            else
-            {
-                if (userPass == pass)
-                {
-                    results[0] = "True";
-                    results[1] = "Pass";
-                    Repo.SetUser(User);
-                    return results;
-                }
-                else
-                {
-                    results[0] = "False";
-                    results[1] = "Pass";
-                    return results;
-                }
-            }
-        }
         //  Events
         private void AppointmentsGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
@@ -112,40 +64,40 @@ namespace Appointment_Manager
         private void ButtonCust_Click(object sender, EventArgs e)
         {
             //  Open Customer form.
-            if (Customer?.IsDisposed != false)
+            if (CustomerForm?.IsDisposed != false)
             {
-                Customer = new Customers(this);
-                Customer.Show();
+                CustomerForm = new Customers(this);
+                CustomerForm.Show();
             }
             else
             {
-                Customer.BringToFront();
+                CustomerForm.BringToFront();
             }
         }
         private void ButtonApt_Click(object sender, EventArgs e)
         {
             //  Open Appointment form.
-            if (Aptmnts?.IsDisposed != false)
+            if (AppointmentForm?.IsDisposed != false)
             {
-                Aptmnts = new Appointments(this);
-                Aptmnts.Show();
+                AppointmentForm = new Appointments(this);
+                AppointmentForm.Show();
             }
             else
             {
-                Aptmnts.BringToFront();
+                AppointmentForm.BringToFront();
             }
         }
         private void ButtonSearch_Click(object sender, EventArgs e)
         {
             //  Open Search form.
-            if (Search?.IsDisposed != false)
+            if (SearchForm?.IsDisposed != false)
             {
-                Search = new Search(this);
-                Search.Show();
+                SearchForm = new Search(this);
+                SearchForm.Show();
             }
             else
             {
-                Search.BringToFront();
+                SearchForm.BringToFront();
             }
         }
         //  Buttons for "reports"
@@ -156,12 +108,9 @@ namespace Appointment_Manager
         private void ButtonConsultants_Click(object sender, EventArgs e)
         {
             UpdateAppointments(true);
-            (AppointmentsGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = null;
-            (AppointmentsGridView.DataSource as DataTable)
-                .DefaultView
-                .Sort = "User Name ASC,Start ASC";
+            DataTable dataTable = (AppointmentsGridView.DataSource as DataTable);
+            dataTable.DefaultView.RowFilter = null;
+            dataTable.DefaultView.Sort = "User Name ASC,Start ASC";
         }
         private void ButtonCustomers_Click(object sender, EventArgs e)
         {
@@ -210,9 +159,8 @@ namespace Appointment_Manager
                     end = DateTime.UtcNow;
                     break;
             }
-            (AppointmentsGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}'", start, end);
+            DataView defaultView = (AppointmentsGridView.DataSource as DataTable)?.DefaultView;
+            defaultView.RowFilter = string.Format("Start > '{0}' AND Start < '{1}'", start, end);
         }
         private void ButtonMonth_Click(object sender, EventArgs e)
         {
@@ -220,9 +168,8 @@ namespace Appointment_Manager
             UpdateAppointments(false);
             DateTime start = DateTime.UtcNow.AddDays(1 - DateTime.UtcNow.Day);
             DateTime end = DateTime.UtcNow.AddDays(DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month) - DateTime.UtcNow.Day);
-            (AppointmentsGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = String.Format("Start > '{0}' AND Start < '{1}'", start, end);
+            DataView defaultView = (AppointmentsGridView.DataSource as DataTable)?.DefaultView;
+            defaultView.RowFilter = string.Format("Start > '{0}' AND Start < '{1}'", start, end);
         }
         private void ButtonExit_Click(object sender, EventArgs e)
         {

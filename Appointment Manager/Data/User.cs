@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
 	public class User
 	{
@@ -12,6 +12,7 @@ namespace Appointment_Manager
 		public string CreatedBy { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string LastUpdateBy { get; set; }
+		public User() { }
 		public User(int userId, string userName, string password, byte active, DateTime createDate, string createdBy, DateTime lastUpdate, string lastUpdateBy)
 		{
 			this.UserId = userId;

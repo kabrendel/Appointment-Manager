@@ -1,27 +1,15 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.ComponentModel;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlTypes;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public class DBObjects
     {
-        //  Collections for database objects.
-        public BindingList<Address> Addresses { get; }
-        public BindingList<City> Cities { get;}
-        public BindingList<Country> Countries { get;}
-        public BindingList<Customer> Customers { get;}
-        //
-        public DBObjects()
-        {
-            //  Initialize collection lists.
-            Addresses = new BindingList<Address>();
-            Cities = new BindingList<City>();
-            Countries = new BindingList<Country>();
-            Customers = new BindingList<Customer>();
-        }
         #region User object methods.
         public BindingList<User> GetUsers()
         {
@@ -42,6 +30,30 @@ namespace Appointment_Manager
             }
             return users;
         }
+        public BindingList<User> GetUserList()
+        {
+            BindingList<User> list = new BindingList<User>();
+            const string sqlString = "SELECT userName,userId FROM user";
+            using (var connection = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var user = new User
+                            {
+                                UserName = rdr[0].ToString(),
+                                UserId = int.Parse(rdr[1].ToString())
+                            };
+                            list.Add(user);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
         public User NewUser(MySqlDataReader rdr)
         {
             return _ = new User
@@ -55,32 +67,6 @@ namespace Appointment_Manager
                     DateTime.SpecifyKind((DateTime)rdr[5], DateTimeKind.Utc),
                     rdr[6].ToString()
                 );
-        }
-        public string UserPassword(string user)
-        {
-            const string sqlString = "SELECT password FROM user WHERE userName = @user";
-            using (var connection2 = Connection.CreateAndOpen())
-            {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    cmd.Parameters.AddWithValue("@user", user);
-                    try
-                    {
-                        using (MySqlDataReader rdr = cmd.ExecuteReader())
-                        {
-                            while (rdr.Read())
-                            {
-                                return _ = rdr[0].ToString();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error retrieving user record from database: " + '\n' + ex, "Appointment Manager");
-                    }
-                }
-            }
-            return null;
         }
         public User UserObject(string user)
         {
@@ -108,8 +94,91 @@ namespace Appointment_Manager
             }
             return null;
         }
+        public string UserPassword(string user)
+        {
+            const string sqlString = "SELECT password FROM user WHERE userName = @user";
+            using (var connection2 = Connection.CreateAndOpen())
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                {
+                    cmd.Parameters.AddWithValue("@user", user);
+                    try
+                    {
+                        using (MySqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                return _ = rdr[0].ToString();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error retrieving user record from database: " + '\n' + ex, "Appointment Manager");
+                    }
+                }
+            }
+            return null;
+        }
         #endregion
         #region Customer object methods.
+        public BindingList<Address> GetAddresses()
+        {
+            BindingList<Address> list = new BindingList<Address>();
+            using (var connection = Connection.CreateAndOpen())
+            {
+                const string sqlString = "SELECT * FROM address";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            list.Add(NewAddr(rdr));
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+        public BindingList<City> GetCities()
+        {
+            BindingList<City> list = new BindingList<City>();
+            using (var connection = Connection.CreateAndOpen())
+            {
+                const string sqlString = "SELECT * FROM city";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            list.Add(NewCity(rdr));
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+        public BindingList<Country> GetCountries()
+        {
+            BindingList<Country> list = new BindingList<Country>();
+            using (var connection = Connection.CreateAndOpen())
+            {
+                const string sqlString = "SELECT * FROM country";
+                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+                {
+                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            list.Add(NewCountry(rdr));
+                        }
+                    }
+                }
+            }
+            return list;
+        }
         public BindingList<Customer> GetCustomers()
         {
             BindingList<Customer> list = new BindingList<Customer>();
@@ -122,74 +191,36 @@ namespace Appointment_Manager
                     {
                         while (rdr.Read())
                         {
-                            list.Add(NewCustomerT(rdr));
+                            list.Add(NewCustomer(rdr));
                         }
                     }
                 }
             }
             return list;
         }
-        public void LoadCustomers()
+        public BindingList<Customer> GetCustomerList()
         {
-            //  Load customer or refresh collections for Customer screen.
-            if (Customers != null)
+            BindingList<Customer> list = new BindingList<Customer>();
+            const string sqlString = "SELECT customerName,customerId FROM customer";
+            using (var connection = Connection.CreateAndOpen())
+            using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
+            using (MySqlDataReader rdr = cmd.ExecuteReader())
             {
-                Addresses.Clear();
-                Cities.Clear();
-                Countries.Clear();
-                Customers.Clear();
-            }
-            using (var connection2 = Connection.CreateAndOpen())
-            {
-                String sqlString = "SELECT * FROM customer";
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
+                while (rdr.Read())
                 {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
+                    var customer = new Customer
                     {
-                        while (rdr.Read())
-                        {
-                            NewCustomer(rdr);
-                        }
-                    }
-                }
-                sqlString = "SELECT * FROM address";
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            NewAddr(rdr);
-                        }
-                    }
-                }
-                sqlString = "SELECT * FROM city";
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            NewCity(rdr);
-                        }
-                    }
-                }
-                sqlString = "SELECT * FROM country";
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            NewCountry(rdr);
-                        }
-                    }
+                        CustomerName = rdr[0].ToString(),
+                        CustomerId = int.Parse(rdr[1].ToString())
+                    };
+                    list.Add(customer);
                 }
             }
+            return list;
         }
-        public void NewAddr(MySqlDataReader rdr)
+        public Address NewAddr(MySqlDataReader rdr)
         {
-            Address temp = new Address
+            return _ = new Address
             (
                 int.Parse(rdr[0].ToString()),
                 rdr[1].ToString(),
@@ -202,16 +233,10 @@ namespace Appointment_Manager
                 DateTime.SpecifyKind((DateTime)rdr[8], DateTimeKind.Utc),
                 rdr[9].ToString()
             );
-            Addresses.Add(temp);
         }
-        public void NewAddr(int addrId, string ad1, string ad2, int cityId, string postal, string phone, DateTime date, string user, DateTime date1, string user1)
+        public City NewCity(MySqlDataReader rdr)
         {
-            Address temp = new Address(addrId, ad1, ad2, cityId, postal, phone, date, user, date1, user1);
-            Addresses.Add(temp);
-        }
-        public void NewCity(MySqlDataReader rdr)
-        {
-            City temp = new City
+            return _ = new City
             (
                 int.Parse(rdr[0].ToString()),
                 rdr[1].ToString(),
@@ -221,18 +246,10 @@ namespace Appointment_Manager
                 DateTime.SpecifyKind((DateTime)rdr[5], DateTimeKind.Utc),
                 rdr[6].ToString()
             );
-            Cities.Add(temp);
         }
-
-        public void NewCity(int cityId, string city, int countryId, DateTime date, string user, DateTime date1, string user1)
+        public Country NewCountry(MySqlDataReader rdr)
         {
-            City temp = new City(cityId, city, countryId, date, user, date1, user1);
-            Cities.Add(temp);
-        }
-
-        public void NewCountry(MySqlDataReader rdr)
-        {
-            Country temp = new Country
+            return _ = new Country
             (
                 int.Parse(rdr[0].ToString()),
                 rdr[1].ToString(),
@@ -241,32 +258,8 @@ namespace Appointment_Manager
                 DateTime.SpecifyKind((DateTime)rdr[4], DateTimeKind.Utc),
                 rdr[5].ToString()
             );
-            Countries.Add(temp);
         }
-
-        public void NewCountry(int countryId, string country, DateTime date, string user, DateTime date1, string user1)
-        {
-            Country temp = new Country(countryId, country, date, user, date1, user1);
-            Countries.Add(temp);
-        }
-
-        public void NewCustomer(MySqlDataReader rdr)
-        {
-            Customer temp = new Customer
-            (
-                int.Parse(rdr[0].ToString()),
-                rdr[1].ToString(),
-                int.Parse(rdr[2].ToString()),
-                bool.Parse(rdr[3].ToString()),
-                DateTime.SpecifyKind((DateTime)rdr[4], DateTimeKind.Utc),
-                rdr[5].ToString(),
-                DateTime.SpecifyKind((DateTime)rdr[6], DateTimeKind.Utc),
-                rdr[7].ToString()
-            );
-            Customers.Add(temp);
-        }
-
-        public Customer NewCustomerT(MySqlDataReader rdr)
+        public Customer NewCustomer(MySqlDataReader rdr)
         {
             return _ = new Customer
             (
@@ -280,12 +273,6 @@ namespace Appointment_Manager
                 rdr[7].ToString()
             );
         }
-        public void NewCustomer(int customerId, string name, int addrId, bool active, DateTime date, string user, DateTime date1, string user1)
-        {
-            Customer temp = new Customer(customerId, name, addrId, active, date, user, date1, user1);
-            Customers.Add(temp);
-        }
-
         #endregion
         #region Appointment object methods.
         public BindingList<Appointment> GetAppointments(int UserId)
@@ -301,7 +288,7 @@ namespace Appointment_Manager
                     {
                         while (rdr.Read())
                         {
-                            list.Add(NewAppointmentT(rdr));
+                            list.Add(NewAppointment(rdr));
                         }
                     }
                 }
@@ -321,14 +308,14 @@ namespace Appointment_Manager
                     {
                         while (rdr.Read())
                         {
-                            list.Add(NewAppointmentT(rdr));
+                            list.Add(NewAppointment(rdr));
                         }
                     }
                 }
             }
             return list;
         }
-        public Appointment NewAppointmentT(MySqlDataReader rdr)
+        public Appointment NewAppointment(MySqlDataReader rdr)
         {
             return _ = new Appointment
             (
@@ -349,12 +336,6 @@ namespace Appointment_Manager
                 rdr[14].ToString()
             );
         }
-
-        //public void NewAppointment(int apptId, int custId, int userId, string title, string desc, string location, string contact, string type, string url, DateTime start, DateTime end, DateTime date, string user, DateTime date1, string user1)
-        //{
-        //    Appointment temp = new Appointment(apptId, custId, userId, title, desc, location, contact, type, url, start, end, date, user, date1, user1);
-        //    Appointments.Add(temp);
-        //}
         #endregion
     }//  End of Class
 }

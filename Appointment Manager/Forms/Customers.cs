@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public partial class Customers : Form
     {
         readonly Main main;
+        private readonly Repository Repo;
+        private readonly SQLQueries SQLFunc;
         //  Collection for data check.
         readonly List<TextBox> TextBoxes;
         public Customers(Main main)
@@ -24,6 +26,8 @@ namespace Appointment_Manager
             };
             this.main = main;
             Location = main.Location;
+            Repo = new Repository();
+            SQLFunc = new SQLQueries();
         }
         private void ButtonExit_Click(object sender, EventArgs e)
         {
@@ -32,7 +36,7 @@ namespace Appointment_Manager
         }
         private void Customers_Load(object sender, EventArgs e)
         {
-            CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
+            CustomerGridView.DataSource = Repo.GetCustomerTable();
             //  Hide Id columns.
             CustomerGridView.Columns[0].Visible = false;
             CustomerGridView.Columns[2].Visible = false;
@@ -46,7 +50,7 @@ namespace Appointment_Manager
                 MessageBox.Show("Error with customer fields, double check entries.",this.Text);
                 return;
             }
-            if (main.SQLFunctions.AddCustomer(
+            if (SQLFunc.AddCustomer(
                 int.Parse(CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex].Cells[0].Value.ToString()),
                 textName.Text,
                 textAdd1.Text,
@@ -59,7 +63,7 @@ namespace Appointment_Manager
             {
                 //  true
                 MessageBox.Show("Customer add success.", this.Text);
-                CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
+                CustomerGridView.DataSource = Repo.GetCustomerTable();
             }
             else
             {
@@ -81,7 +85,7 @@ namespace Appointment_Manager
                 MessageBox.Show("Error with customer fields, double check entries.", this.Text);
                 return;
             }
-            if (main.SQLFunctions.UpdateCustomer(
+            if (SQLFunc.UpdateCustomer(
                 int.Parse(row.Cells["Customer Id"].Value.ToString()),
                 int.Parse(row.Cells["Address Id"].Value.ToString()),
                 int.Parse(row.Cells["City Id"].Value.ToString()),
@@ -97,7 +101,7 @@ namespace Appointment_Manager
             {
                 //  true
                 MessageBox.Show("Customer updated successfully.", this.Text);
-                CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
+                CustomerGridView.DataSource = Repo.GetCustomerTable();
             }
             else
             {
@@ -124,10 +128,10 @@ namespace Appointment_Manager
                     int addr = int.Parse(row.Cells["Address Id"].Value.ToString());
                     int city = int.Parse(row.Cells["City Id"].Value.ToString());
                     int cntry = int.Parse(row.Cells["Country Id"].Value.ToString());
-                    if (main.SQLFunctions.DeleteCustomer(cust, addr, city, cntry))
+                    if (SQLFunc.DeleteCustomer(cust, addr, city, cntry))
                     {
                         MessageBox.Show("Customer successfully deleted.", this.Text);
-                        CustomerGridView.DataSource = main.DTBuilder.BuildCustomerTable();
+                        CustomerGridView.DataSource = Repo.GetCustomerTable();
                     }
                     else
                     {
@@ -168,12 +172,7 @@ namespace Appointment_Manager
         }
         private void CustomerGridView_SelectionChanged(object sender, EventArgs e)
         {
-            if ((CustomerGridView.CurrentCell == null) || (CustomerGridView.CurrentCell.RowIndex <= -1))
-            {
-                //  No cell selected or column header selected.
-                return;
-            }
-            else
+            if (CustomerGridView.CurrentCell?.RowIndex > -1)
             {
                 //  Update text boxes to selected data row.
                 DataGridViewRow row = CustomerGridView.Rows[CustomerGridView.CurrentCell.RowIndex];

@@ -1,4 +1,4 @@
-﻿namespace Appointment_Manager
+﻿namespace Appointment_Scheduler
 {
     partial class Main
     {
@@ -44,7 +44,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.AppointmentsGridView)).BeginInit();
             this.SuspendLayout();
             // 
-            // dataGridView1
+            // AppointmentsGridView
             // 
             this.AppointmentsGridView.AllowUserToAddRows = false;
             this.AppointmentsGridView.AllowUserToDeleteRows = false;
@@ -55,7 +55,7 @@
             this.AppointmentsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.AppointmentsGridView.Location = new System.Drawing.Point(158, 12);
             this.AppointmentsGridView.MultiSelect = false;
-            this.AppointmentsGridView.Name = "dataGridView1";
+            this.AppointmentsGridView.Name = "AppointmentsGridView";
             this.AppointmentsGridView.ReadOnly = true;
             this.AppointmentsGridView.RowHeadersVisible = false;
             this.AppointmentsGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -206,7 +206,7 @@
             this.MinimumSize = new System.Drawing.Size(815, 480);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Appointment Calendar";
+            this.Text = "Appointment Scheduler";
             this.Load += new System.EventHandler(this.Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.AppointmentsGridView)).EndInit();
             this.ResumeLayout(false);

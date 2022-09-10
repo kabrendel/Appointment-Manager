@@ -5,89 +5,68 @@ using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public class DataTables
     {
-        readonly Main main;
         private readonly DBObjects DBObject;
-        public DataTables(Main main,DBObjects objects)
-        {
-            this.main = main;
-            DBObject = objects;
-        }
         public DataTables(DBObjects objects)
         {
             DBObject = objects;
         }
-        //  list builders
         public DataTable CustomerList()
         {
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
-            const string sqlString = "SELECT customerName,customerId FROM customer";
-            using (var connection2 = Connection.CreateAndOpen())
+            foreach (Customer c in DBObject.GetCustomerList())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            DataRow row = dataTable.NewRow();
-                            row["Name"] = rdr[0].ToString();
-                            row["ID"] = int.Parse(rdr[1].ToString());
-                            dataTable.Rows.Add(row);
-                        }
-                    }
-                }
+                DataRow row = dataTable.NewRow();
+                row["Name"] = c.CustomerName;
+                row["Id"] = c.CustomerId;
+                dataTable.Rows.Add(row);
             }
             return dataTable;
         }
         public List<string> TypeList()
         {
-            List<string> list = new List<string>
+            return _ = new List<string>
             {
                 "Test",
                 "Scrum",
                 "Presentation"
             };
-            return list;
         }
-        public DataTable UserList(bool all)
+        public DataTable UserList(bool all,int userId)
         {
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Name", typeof(string));
             dataTable.Columns.Add("ID", typeof(int));
-            const string sqlString = "SELECT userName,userId FROM user";
-            using (var connection2 = Connection.CreateAndOpen())
+            foreach (User u in DBObject.GetUserList())
             {
-                using (MySqlCommand cmd = new MySqlCommand(sqlString, connection2))
-                {
-                    using (MySqlDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            DataRow row = dataTable.NewRow();
-                            row["Name"] = rdr[0].ToString();
-                            row["ID"] = int.Parse(rdr[1].ToString());
-                            dataTable.Rows.Add(row);
-                        }
-                    }
-                }
+                DataRow row = dataTable.NewRow();
+                row["Name"] = u.UserName;
+                row["Id"] = u.UserId;
+                dataTable.Rows.Add(row);
             }
             if (!all)
             {
                 //  Filter to just the logged in users appointments.
-                dataTable.DefaultView.RowFilter = String.Format("[Id] = {0}", main.User.UserId);
+                dataTable.DefaultView.RowFilter = String.Format("[Id] = {0}", userId);
             }
             return dataTable;
         }
-        // table builders
-        public DataTable BuildAppointmentTable(BindingList<Appointment> apt,BindingList<Customer> cst,BindingList<User> usr)
+        public DataTable BuildAppointmentTable(Tuple<bool,int> user)
         {
-
+            BindingList<Appointment> appointments = new BindingList<Appointment>();
+            if (user.Item1)
+            {
+                appointments = DBObject.GetAppointments(user.Item2);
+            }
+            else
+            {
+                appointments = DBObject.GetAppointments();
+            }
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("User Id", typeof(int));              //  User table.
             dataTable.Columns.Add("User Name", typeof(string));         //  User table.
@@ -100,7 +79,7 @@ namespace Appointment_Manager
             dataTable.Columns["Start"].DateTimeMode = DataSetDateTime.Local;
             dataTable.Columns.Add("End", typeof(DateTime));             //  Appointment table.
             dataTable.Columns["End"].DateTimeMode = DataSetDateTime.Local;
-            foreach (Appointment a in apt)
+            foreach (Appointment a in appointments)
             {
                 DataRow row = dataTable.NewRow();
                 row["Appointment Id"] = a.AppointmentId;
@@ -108,7 +87,7 @@ namespace Appointment_Manager
                 row["Start"] = a.Start;
                 row["End"] = a.End;
                 row["Type"] = a.Type;
-                foreach (Customer c in cst)
+                foreach (Customer c in DBObject.GetCustomers())
                 {
                     if (a.CustomerId == c.CustomerId)
                     {
@@ -117,7 +96,7 @@ namespace Appointment_Manager
                         break;
                     }
                 }
-                foreach (User u in usr)
+                foreach (User u in DBObject.GetUsers())
                 {
                     if (a.UserId == u.UserId)
                     {
@@ -127,14 +106,13 @@ namespace Appointment_Manager
                     }
                 }
                 dataTable.Rows.Add(row);
-
             }
             dataTable.DefaultView.Sort = "Start ASC";
             return dataTable;
         }
-
         public DataTable BuildCustomerTable()
         {
+            DBObjects db = new DBObjects();
             //  Build a DataTable to show customer data in Customer Form.
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Customer Id", typeof(int));          //  customer table.
@@ -148,12 +126,12 @@ namespace Appointment_Manager
             dataTable.Columns.Add("Country Id", typeof(string));        //  country table.
             dataTable.Columns.Add("Country", typeof(string));           //  country table.
             dataTable.Columns.Add("Phone Number", typeof(string));      //  address table.
-            foreach (Customer c in DBObject.Customers)
+            foreach (Customer c in db.GetCustomers())
             {
                 DataRow row = dataTable.NewRow();
                 row["Customer Id"] = c.CustomerId;
                 row["Customer Name"] = c.CustomerName;
-                foreach (Address a in DBObject.Addresses)
+                foreach (Address a in db.GetAddresses())
                 {
                     if (a.AddressId == c.AddressId)
                     {
@@ -162,13 +140,13 @@ namespace Appointment_Manager
                         row["Address2"] = a.Address2;
                         row["Postal Code"] = a.PostalCode;
                         row["Phone Number"] = a.Phone;
-                        foreach (City i in DBObject.Cities)
+                        foreach (City i in db.GetCities())
                         {
                             if (i.CityId == a.CityId)
                             {
                                 row["City Id"] = i.CityId;
                                 row["City"] = i.ACity;
-                                foreach (Country y in DBObject.Countries)
+                                foreach (Country y in db.GetCountries())
                                 {
                                     if (y.CountryId == i.CountryId)
                                     {
@@ -177,7 +155,6 @@ namespace Appointment_Manager
                                         goto Rowbuilt;
                                     }
                                 }
-
                             }
                         }
                     }
@@ -201,7 +178,6 @@ namespace Appointment_Manager
             dataTable.DefaultView.Sort = "Customer Id ASC";
             return dataTable;
         }
-
         public DataTable CustomerReport()
         {
             DataTable dt = new DataTable();
@@ -223,7 +199,6 @@ namespace Appointment_Manager
             }
             return null;
         }
-
         public DataTable MonthlyReport()
         {
             DataTable dt = new DataTable();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
 	public class Address
 	{

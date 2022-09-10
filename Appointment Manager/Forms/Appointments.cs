@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public partial class Appointments : Form
     {
+        //
         readonly Main main;
+        private readonly Repository Repo;
+        private readonly SQLQueries SQLFunc;
         //  Collections for dropboxes.
         private List<string> Type;
         private DataTable Customer;
@@ -28,11 +31,12 @@ namespace Appointment_Manager
             InitializeComponent();
             this.main = main;
             Location = main.Location;
-
+            Repo = new Repository();
+            SQLFunc = new SQLQueries();
             Type = new List<string>();
             Customer = new DataTable();
             User = new DataTable();
-            AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
+            AppointmentGridView.DataSource = Repo.GetAppointmentTable();
             AppointmentGridView.Columns[0].Visible = false;
             AppointmentGridView.Columns[2].Visible = false;
             AppointmentGridView.Columns[4].Visible = false;
@@ -40,9 +44,9 @@ namespace Appointment_Manager
 
         private void Appointments_Load(object sender, EventArgs e)
         {
-            Type = main.DTBuilder.TypeList();
-            Customer = main.DTBuilder.CustomerList();
-            User = main.DTBuilder.UserList(false);
+            Type = Repo.GetTypeList();
+            Customer = Repo.GetCustomerList();
+            User = Repo.GetUserList(false);
         }
 
         private void AppointmentGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -78,7 +82,7 @@ namespace Appointment_Manager
                         }
                     }
                 }
-                if (main.SQLFunctions.CreateAppointment(ACustomer, AUser, AType, startDate, endDate))
+                if (SQLFunc.CreateAppointment(ACustomer, AUser, AType, startDate, endDate))
                 {
                     MessageBox.Show("Appointment created.", this.Text);
                 }
@@ -87,7 +91,7 @@ namespace Appointment_Manager
                     //  Error message shown in method call.
                 }
                 //  reload appointments.
-                AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
+                AppointmentGridView.DataSource = Repo.GetAppointmentTable();
             }
             else
             {
@@ -122,7 +126,7 @@ namespace Appointment_Manager
                         }
                     }
                 }
-                if (main.SQLFunctions.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()),ACustomer, AUser, AType, startDate, endDate))
+                if (SQLFunc.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()),ACustomer, AUser, AType, startDate, endDate))
                 {
                     MessageBox.Show("Appointment updated.", this.Text);
                 }
@@ -131,7 +135,7 @@ namespace Appointment_Manager
                     //  Error message shown in method call.
                 }
                 //  reload appointments.
-                AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
+                AppointmentGridView.DataSource = Repo.GetAppointmentTable();
             }
             else
             {
@@ -145,10 +149,10 @@ namespace Appointment_Manager
             if (confirmDelete == DialogResult.OK)
             {
                 DataGridViewRow row = AppointmentGridView.Rows[AppointmentGridView.CurrentCell.RowIndex];
-                if (main.SQLFunctions.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
+                if (SQLFunc.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
                 {
                     MessageBox.Show("Appointment deleted.", this.Text);
-                    AppointmentGridView.DataSource = main.Repo.GetAppointmentTable();
+                    AppointmentGridView.DataSource = Repo.GetAppointmentTable();
                 }
                 else
                 {

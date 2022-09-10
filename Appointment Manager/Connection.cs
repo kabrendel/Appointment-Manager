@@ -1,22 +1,15 @@
 ﻿using System;
+using System.Configuration;
+using System.Data.Common;
 using MySql.Data.MySqlClient;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
-    internal class Connection : IDisposable
+    internal sealed class Connection// : IDisposable
     {
-        //  Strings for database.
-        private const string server = "localhost";
-        private const string database = "clientschedule";
-        private const string uid = "Student";
-        private const string pass = "student";
-        //  Connection string.
-        private const string connectionString = "server=" + server + ";userid=" + uid + ";" +
-            "password=" + pass + ";database=" + database + ";";
-        private bool disposed = false;
-        //
+        private static readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
+        //private bool _disposed = false;
         private Connection() { }
-
         public static MySqlConnection CreateAndOpen()
         {
             var connection = new MySqlConnection(connectionString);
@@ -24,22 +17,13 @@ namespace Appointment_Manager
             return connection;
         }
         //  Disposal
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        private void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    //??
-                }
-                disposed = true;
-            }
-        }
-        //  End of class
+        //public void Dispose()
+        //{
+        //    if (!_disposed)
+        //    {
+        //        _connection.Dispose(); // or Close
+        //        _disposed = false;
+        //    }
+        //}
     }
 }

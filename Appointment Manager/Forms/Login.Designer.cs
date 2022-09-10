@@ -1,5 +1,5 @@
 ﻿
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     partial class Login
     {

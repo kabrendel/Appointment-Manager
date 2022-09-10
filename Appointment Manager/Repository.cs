@@ -1,30 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public class Repository
     {
-        //  Repository class for domain layer
-        //  repository should create a DBObjects object
-        //  datatables??
-        private DBObjects _dbObjects;
-        private DataTables _dataTables;
-        private User _user;
-        //  Constructor
+        //  Statics
+        static User User;
+        //  Access Database and list/table builders.
+        private readonly DBObjects _dbObjects;
+        private readonly DataTables _dataTables;
         public Repository()
         {
             _dbObjects = new DBObjects();
             _dataTables = new DataTables(_dbObjects);
         }
         //
-        public string UserPassword(string user)
+        public string GetUserPassword(string user)
         {
             return _dbObjects.UserPassword(user);
         }
-        public User UserObject(string user)
+        public User GetUserObject(string user)
         {
             return _dbObjects.UserObject(user);
         }
@@ -39,21 +37,41 @@ namespace Appointment_Manager
         }
         public DataTable GetAppointmentTable()
         {
-            return _dataTables.BuildAppointmentTable(_dbObjects.GetAppointments(_user.UserId),_dbObjects.GetCustomers(),_dbObjects.GetUsers());
+            Tuple<bool,int> user = new Tuple<bool,int>(false,User.UserId);
+            return _dataTables.BuildAppointmentTable(user);
         }
         public DataTable GetAppointmentTableAll()
         {
-            return _dataTables.BuildAppointmentTable(_dbObjects.GetAppointments(), _dbObjects.GetCustomers(), _dbObjects.GetUsers());
+            Tuple<bool, int> user = new Tuple<bool, int>(true, User.UserId);
+            return _dataTables.BuildAppointmentTable(user);
+        }
+        public DataTable GetCustomerTable()
+        {
+            return _dataTables.BuildCustomerTable();
+        }
+        internal List<string> GetTypeList()
+        {
+            return _dataTables.TypeList();
+        }
+        internal DataTable GetCustomerList()
+        {
+            return _dataTables.CustomerList();
+        }
+        internal DataTable GetUserList(bool all)
+        {
+            return _dataTables.UserList(all, User.UserId);
         }
         internal void SetUser(User user)
         {
-            // replace later..
-            _user = user;
+            User = user;
+        }
+        internal string GetUserName()
+        {
+            return User.UserName;
         }
         internal BindingList<Appointment> GetUserAppointments()
         {
-            return _dbObjects.GetAppointments();
+            return _dbObjects.GetAppointments(User.UserId);
         }
-        //
     }// End of class.
 }

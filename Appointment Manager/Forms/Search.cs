@@ -4,11 +4,14 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public partial class Search : Form
     {
-        readonly Main main;
+        //
+        private readonly Main main;
+        private readonly Repository repo;
+        //
         private List<string> Type;
         private DataTable Customer;
         private DataTable User;
@@ -17,6 +20,7 @@ namespace Appointment_Manager
             InitializeComponent();
             this.main = main;
             Location = main.Location;
+            repo = new Repository();
         }
 
         private void Search_Load(object sender, EventArgs e)
@@ -25,17 +29,17 @@ namespace Appointment_Manager
             Customer = new DataTable();
             User = new DataTable();
             //  Loast list of types from data.
-            Type = main.DTBuilder.TypeList();
+            Type = repo.GetTypeList();
             cmbType.DataSource = Type;
             cmbType.SelectedIndex = -1;
             //  Load list of customer's from data.
-            Customer = main.DTBuilder.CustomerList();
+            Customer = repo.GetCustomerList();
             cmbCust.DisplayMember = "Name";
             cmbCust.ValueMember = "ID";
             cmbCust.DataSource = Customer;
             cmbCust.SelectedIndex = -1;
             //  Load user list from data.
-            User = main.DTBuilder.UserList(true);
+            User = repo.GetUserList(true);
             cmbUser.DisplayMember = "Name";
             cmbUser.ValueMember = "ID";
             cmbUser.DataSource = User;
@@ -53,7 +57,7 @@ namespace Appointment_Manager
             //
             dateTimePicker1.Value = dateTimePicker1.MinDate;
             dateTimePicker2.Value = dateTimePicker2.MaxDate;
-            SearchGridView.DataSource = main.Repo.GetAppointmentTableAll();
+            SearchGridView.DataSource = repo.GetAppointmentTableAll();
             SearchGridView.Columns[0].Visible = false;
             SearchGridView.Columns[2].Visible = false;
             SearchGridView.Columns[4].Visible = false;

@@ -2,15 +2,17 @@
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace Appointment_Manager
+namespace Appointment_Scheduler
 {
     public partial class Login : Form
     {
         readonly Main main;
+        private readonly Repository Repo;
         public Login(Main main)
         {
             InitializeComponent();
             this.main = main;
+            Repo = new Repository();
             buttonLogin.DialogResult = DialogResult.OK;
             buttonExit.DialogResult = DialogResult.Cancel;
         }
@@ -60,8 +62,8 @@ namespace Appointment_Manager
                 }
                 return;
             }
-            string[] results = main.UserLogin(textUser.Text, textPass.Text);
-            if (bool.Parse(results[0]))
+            Tuple<bool, string> results = UserLogin(textUser.Text, textPass.Text);
+            if (results.Item1)
             {
                 log.Log(true, textUser.Text);
                 this.DialogResult = DialogResult.OK;
@@ -69,7 +71,7 @@ namespace Appointment_Manager
             }
             else
             {
-                switch (results[1])
+                switch (results.Item2)
                 {
                     case "DB":
                         if (CultureInfo.CurrentCulture.Name == "es-MX")
@@ -138,6 +140,25 @@ namespace Appointment_Manager
             }
         }
 
+        public Tuple<bool, string> UserLogin(string user, string pass)
+        {
+            if (Repo.GetUserObject(user) == null)
+            {
+                return _ = Tuple.Create(false, "User");
+            }
+            else
+            {
+                if (Repo.GetUserPassword(user) == pass)
+                {
+                    Repo.SetUser(Repo.GetUserObject(user));
+                    return _ = Tuple.Create(true, "Pass");
+                }
+                else
+                {
+                    return _ = Tuple.Create(false, "Pass");
+                }
+            }
+        }
         private bool ValidateText (string name, string data)
         {
             switch (name)
