@@ -7,16 +7,17 @@ namespace Appointment_Scheduler
 {
     public class SQLQueries
     {
-        private readonly Repository Repo;
+        //private readonly Repository Repo;
         private readonly string windowText = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-        private static readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
+        private readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
+        private readonly string userName = ConfigurationManager.AppSettings["userid"];
         //  Constructor
         public SQLQueries()
         {
-            Repo = new Repository();
+            //Repo = new Repository();
         }
         //  Connection Method
-        public static MySqlConnection CreateAndOpen()
+        private MySqlConnection CreateAndOpen()
         {
             var connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -46,9 +47,9 @@ namespace Appointment_Scheduler
                     cmd.Parameters.AddWithValue("@start", start.ToUniversalTime());
                     cmd.Parameters.AddWithValue("@end", end.ToUniversalTime());
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user1", userName);
                     cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user2", userName);
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -62,7 +63,6 @@ namespace Appointment_Scheduler
                 }
             }
         }
-
         public bool UpdateAppointment(int appointmentId, int customerId, int userId, string type, DateTime start, DateTime end)
         {
             const string sqlString = "UPDATE appointment SET customerId = @customer, userId = @user,type = @type,start = @start,end = @end,lastUpdate = @time2,lastUpdateBy = @user2 WHERE appointmentId = @appointmentId";
@@ -77,7 +77,7 @@ namespace Appointment_Scheduler
                     cmd.Parameters.AddWithValue("@start", start.ToUniversalTime());
                     cmd.Parameters.AddWithValue("@end", end.ToUniversalTime());
                     cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user2", userName);
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -133,18 +133,18 @@ namespace Appointment_Scheduler
                         cmd = new MySqlCommand(countryString, connection);
                         cmd.Parameters.AddWithValue("@country", country);
                         cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user1", userName);
                         cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user2", userName);
                         var countryIndex = cmd.ExecuteScalar();
 
                         cmd = new MySqlCommand(cityString, connection);
                         cmd.Parameters.AddWithValue("@city", city);
                         cmd.Parameters.AddWithValue("@countryId", countryIndex);
                         cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user1", userName);
                         cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user2", userName);
                         var cityIndex = cmd.ExecuteScalar();
 
                         cmd = new MySqlCommand(addrString, connection);
@@ -154,9 +154,9 @@ namespace Appointment_Scheduler
                         cmd.Parameters.AddWithValue("@postal", postal);
                         cmd.Parameters.AddWithValue("@phone", phone);
                         cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user1", userName);
                         cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user2", userName);
                         var addressIndex = cmd.ExecuteScalar();
 
                         cmd = new MySqlCommand(custString, connection);
@@ -164,9 +164,9 @@ namespace Appointment_Scheduler
                         cmd.Parameters.AddWithValue("@addrId", addressIndex);
                         cmd.Parameters.AddWithValue("@bool", true);
                         cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user1", userName);
                         cmd.Parameters.AddWithValue("@time2", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@user2", Repo.GetUserName());
+                        cmd.Parameters.AddWithValue("@user2", userName);
                         var customerIndex = cmd.ExecuteScalar();
                         return true;
                     }
@@ -178,7 +178,6 @@ namespace Appointment_Scheduler
                 }
             }
         }
-
         public bool UpdateCustomer(int customerId, int addressId, int cityId, int countryId, string name, string ad1, string ad2, string city, string postal, string country, string phone)
         {
             const string countryString = "UPDATE country SET country = @country, lastUpdate = @time1, lastUpdateBy = @user1 WHERE countryid = @countryId";
@@ -193,7 +192,7 @@ namespace Appointment_Scheduler
                     cmd = new MySqlCommand(countryString, connection);
                     cmd.Parameters.AddWithValue("@country", country);
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user1", userName);
                     cmd.Parameters.AddWithValue("@countryId", countryId);
                     cmd.ExecuteNonQuery();
 
@@ -201,7 +200,7 @@ namespace Appointment_Scheduler
                     cmd.Parameters.AddWithValue("@city", city);
                     cmd.Parameters.AddWithValue("@countryId", countryId);
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user1", userName);
                     cmd.Parameters.AddWithValue("@cityId", cityId);
                     cmd.ExecuteNonQuery();
 
@@ -212,7 +211,7 @@ namespace Appointment_Scheduler
                     cmd.Parameters.AddWithValue("@postal", postal);
                     cmd.Parameters.AddWithValue("@phone", phone);
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user1", userName);
                     cmd.Parameters.AddWithValue("@addrId", addressId);
                     cmd.ExecuteNonQuery();
 
@@ -221,7 +220,7 @@ namespace Appointment_Scheduler
                     cmd.Parameters.AddWithValue("@addrId", addressId);
                     cmd.Parameters.AddWithValue("@bool", true);
                     cmd.Parameters.AddWithValue("@time1", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@user1", Repo.GetUserName());
+                    cmd.Parameters.AddWithValue("@user1", userName);
                     cmd.Parameters.AddWithValue("@customerId", customerId);
                     cmd.ExecuteNonQuery();
                     return true;
@@ -233,7 +232,6 @@ namespace Appointment_Scheduler
                 }
             }
         }
-
         public bool DeleteCustomer(int cust, int addr, int city, int cntry)
         {
             const string countryString = "DELETE FROM country WHERE countryId=@countryId";
@@ -322,5 +320,5 @@ namespace Appointment_Scheduler
                 }
             }
         }
-    }
+    }// End of class
 }

@@ -58,6 +58,7 @@ namespace Appointment_Scheduler
             // 
             // buttonLogin
             // 
+            this.buttonLogin.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonLogin.Location = new System.Drawing.Point(67, 91);
             this.buttonLogin.Name = "buttonLogin";
             this.buttonLogin.Size = new System.Drawing.Size(124, 20);

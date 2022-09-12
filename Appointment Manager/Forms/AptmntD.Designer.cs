@@ -56,6 +56,7 @@ namespace Appointment_Scheduler
             // 
             // buttonAccept
             // 
+            this.buttonAccept.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonAccept.Location = new System.Drawing.Point(93, 194);
             this.buttonAccept.Name = "buttonAccept";
             this.buttonAccept.Size = new System.Drawing.Size(75, 23);
@@ -66,13 +67,13 @@ namespace Appointment_Scheduler
             // 
             // buttonExit
             // 
+            this.buttonExit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonExit.Location = new System.Drawing.Point(174, 194);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(75, 23);
             this.buttonExit.TabIndex = 9;
             this.buttonExit.Text = "Exit";
             this.buttonExit.UseVisualStyleBackColor = true;
-            this.buttonExit.Click += new System.EventHandler(this.ButtonExit_Click);
             // 
             // cmbUser
             // 
@@ -173,7 +174,7 @@ namespace Appointment_Scheduler
             this.lblEnd.TabIndex = 10;
             this.lblEnd.Text = "End:";
             // 
-            // AptmntD
+            // AppointmentDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -194,7 +195,7 @@ namespace Appointment_Scheduler
             this.Controls.Add(this.label1);
             this.MaximumSize = new System.Drawing.Size(320, 280);
             this.MinimumSize = new System.Drawing.Size(320, 280);
-            this.Name = "AptmntD";
+            this.Name = "AppointmentDialog";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Appointment";

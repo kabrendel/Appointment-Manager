@@ -10,7 +10,7 @@ namespace Appointment_Scheduler
     public class DBObjects
     {
         private static readonly string connectionString = ConfigurationManager.ConnectionStrings["Database"].ToString();
-        public static MySqlConnection CreateAndOpen()
+        private static MySqlConnection CreateAndOpen()
         {
             var connection = new MySqlConnection(connectionString);
             connection.Open();

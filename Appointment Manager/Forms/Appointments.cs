@@ -7,16 +7,15 @@ namespace Appointment_Scheduler
 {
     public partial class Appointments : Form
     {
-        //
+        //  Winform objects.
         readonly Main main;
+        private AppointmentDialog Dialog;
+        //  Repository access object.
         private readonly Repository Repo;
-        private readonly SQLQueries SQLFunc;
         //  Collections for dropboxes.
         private List<string> Type;
         private DataTable Customer;
         private DataTable User;
-        //  Appointment Dialog form object.
-        private AppointmentDialog Dialog;
         //  Vars for adding, modifying, deleting appointments.
         public string AType { get; set; }
         public int ACustomer { get; set; }
@@ -32,7 +31,6 @@ namespace Appointment_Scheduler
             this.main = main;
             Location = main.Location;
             Repo = new Repository();
-            SQLFunc = new SQLQueries();
             Type = new List<string>();
             Customer = new DataTable();
             User = new DataTable();
@@ -41,25 +39,18 @@ namespace Appointment_Scheduler
             AppointmentGridView.Columns[2].Visible = false;
             AppointmentGridView.Columns[4].Visible = false;
         }
-
         private void Appointments_Load(object sender, EventArgs e)
         {
             Type = Repo.GetTypeList();
             Customer = Repo.GetCustomerList();
             User = Repo.GetUserList(false);
         }
-
+        //  Events
         private void AppointmentGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             AppointmentGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
-
-        private void ButtonExit_Click(object sender, EventArgs e)
-        {
-            main.UpdateAppointments(false);
-            Dispose();
-        }
-
+        //  Buttons for CRUD.
         private void ButtonCreate_Click(object sender, EventArgs e)
         {
             Caller = "create";
@@ -82,23 +73,13 @@ namespace Appointment_Scheduler
                         }
                     }
                 }
-                if (SQLFunc.CreateAppointment(ACustomer, AUser, AType, startDate, endDate))
+                if (Repo.CreateAppointment(ACustomer, AUser, AType, startDate, endDate))
                 {
                     MessageBox.Show("Appointment created.", this.Text);
                 }
-                else
-                {
-                    //  Error message shown in method call.
-                }
-                //  reload appointments.
                 AppointmentGridView.DataSource = Repo.GetAppointmentTable();
             }
-            else
-            {
-                //  exit
-            }
         }
-
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {
             Caller = "update";
@@ -120,43 +101,30 @@ namespace Appointment_Scheduler
                             //  startDate can't be between start or end of any existing appointment for the user.
                             if (startDate >= DateTime.Parse(r.Cells["Start"].Value.ToString()) && startDate <= DateTime.Parse(r.Cells["End"].Value.ToString()))
                             {
-                                MessageBox.Show("Updated appointment conflicts with an existing appointment.", this.Text);
+                                MessageBox.Show("Updated appointment conflicts with an existing appointment.", Text);
                                 return;
                             }
                         }
                     }
                 }
-                if (SQLFunc.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()),ACustomer, AUser, AType, startDate, endDate))
+                if (Repo.UpdateAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString()), ACustomer, AUser, AType, startDate, endDate))
                 {
-                    MessageBox.Show("Appointment updated.", this.Text);
-                }
-                else
-                {
-                    //  Error message shown in method call.
+                    MessageBox.Show("Appointment updated.", Text);
                 }
                 //  reload appointments.
                 AppointmentGridView.DataSource = Repo.GetAppointmentTable();
             }
-            else
-            {
-                //  exit
-            }
         }
-
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
-            var confirmDelete = MessageBox.Show("Are you sure you want to delete this appointment?", this.Text, MessageBoxButtons.OKCancel);
+            var confirmDelete = MessageBox.Show("Are you sure you want to delete this appointment?", Text, MessageBoxButtons.OKCancel);
             if (confirmDelete == DialogResult.OK)
             {
                 DataGridViewRow row = AppointmentGridView.Rows[AppointmentGridView.CurrentCell.RowIndex];
-                if (SQLFunc.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
+                if (Repo.RemoveAppointment(int.Parse(row.Cells["Appointment Id"].Value.ToString())))
                 {
-                    MessageBox.Show("Appointment deleted.", this.Text);
+                    MessageBox.Show("Appointment deleted.", Text);
                     AppointmentGridView.DataSource = Repo.GetAppointmentTable();
-                }
-                else
-                {
-                    //  Error message shown in method call.
                 }
             }
             else
@@ -164,7 +132,12 @@ namespace Appointment_Scheduler
                 return;
             }
         }
-
+        private void ButtonExit_Click(object sender, EventArgs e)
+        {
+            main.UpdateAppointments(false);
+            Dispose();
+        }
+        //  Selected appointment in DGV.
         public string[] GetSelected()
         {
             DataGridViewRow row = AppointmentGridView.Rows[AppointmentGridView.CurrentCell.RowIndex];

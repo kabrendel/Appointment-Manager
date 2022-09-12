@@ -7,6 +7,7 @@ namespace Appointment_Scheduler
 {
     public partial class AppointmentDialog : Form
     {
+        //  Winform objects.
         readonly Appointments apt;
         public AppointmentDialog(List<string> Type, DataTable Customer, DataTable User, Appointments apt)
         {
@@ -19,9 +20,7 @@ namespace Appointment_Scheduler
             apt.AStartTime = null;
             apt.AEnd = null;
             apt.AEndTime = null;
-
-            buttonAccept.DialogResult = DialogResult.OK;
-            buttonExit.DialogResult = DialogResult.Cancel;
+            //
             cmbType.DataSource = Type;
             //
             cmbCust.DisplayMember = "Name";
@@ -40,15 +39,14 @@ namespace Appointment_Scheduler
             cmbEndTime.ValueMember = "Span";
             cmbEndTime.DataSource = BuildComboTime();
             //
-            //  Set values for Updating an appointment
+            //  Set values for updating an appointment
             SetSelected();
         }
-
         private DataTable BuildComboTime()
         {
             TimeSpan open = new TimeSpan(08, 00, 00);
-            TimeSpan close = new TimeSpan(20,00,00);
-            TimeSpan increment = new TimeSpan(00,15,00);
+            TimeSpan close = new TimeSpan(20, 00, 00);
+            TimeSpan increment = new TimeSpan(00, 15, 00);
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("Time", typeof(string));
             dataTable.Columns.Add("Span", typeof(string));
@@ -62,76 +60,20 @@ namespace Appointment_Scheduler
             }
             return dataTable;
         }
-
-        private void ButtonExit_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void ButtonAccept_Click(object sender, EventArgs e)
-        {
-            apt.AType = cmbType.SelectedItem.ToString();                    //  Appointment Type
-            apt.ACustomer = int.Parse(cmbCust.SelectedValue.ToString());    //  Customer Id
-            apt.AUser = int.Parse(cmbUser.SelectedValue.ToString());        //  User Id
-            apt.AStart = dtpStart.Value.Date.ToString();
-            apt.AStartTime = cmbStartTime.SelectedValue.ToString();
-            apt.AEnd = dtpStart.Value.Date.ToString();
-            apt.AEndTime = cmbEndTime.SelectedValue.ToString();
-        }
-
-        private void SetSelected()
-        {
-            //  Set form values to values from selected appointment to update.
-            if (apt.Caller == "update")
-            {
-                string[] selected = apt.GetSelected();
-                cmbUser.SelectedIndex = cmbUser.FindString(selected[0]);
-                cmbCust.SelectedIndex = cmbCust.FindString(selected[1]);
-                cmbType.SelectedIndex = cmbType.FindString(selected[2]);
-                dtpStart.Value = DateTime.Parse(selected[3]);
-                cmbStartTime.SelectedIndex = cmbStartTime.FindString(selected[4]);
-                cmbEndTime.SelectedIndex = cmbEndTime.FindString(selected[5]);
-            }
-        }
-
         private void CmbStartTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((cmbEndTime.DataSource == null) || (cmbStartTime.DataSource == null))
+            if ((cmbEndTime.DataSource != null) && (cmbStartTime.DataSource != null))
             {
-                return;
-            }
-            else
-            {
-                if (DataCheck())
-                {
-                    buttonAccept.Enabled = true;
-                }
-                else
-                {
-                    buttonAccept.Enabled = false;
-
-                }
+                buttonAccept.Enabled = DataCheck();
             }
         }
-
         private void CmbEndTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ((cmbEndTime.DataSource == null) || (cmbStartTime.DataSource == null))
+            if ((cmbEndTime.DataSource != null) && (cmbStartTime.DataSource != null))
             {
-                return;
-            }
-            else
-            {
-                if (DataCheck())
-                {
-                    buttonAccept.Enabled = true;
-                }
-                else
-                {
-                    buttonAccept.Enabled = false;
-                }
+                buttonAccept.Enabled = DataCheck();
             }
         }
-
         private bool DataCheck()
         {
             if (cmbStartTime.SelectedIndex == 0 && cmbEndTime.SelectedIndex == 0)
@@ -180,6 +122,31 @@ namespace Appointment_Scheduler
                 lblEnd.ForeColor = System.Drawing.Color.Red;
                 return false;
             }
+        }
+        private void SetSelected()
+        {
+            //  Set form values to values from selected appointment to update.
+            if (apt.Caller == "update")
+            {
+                string[] selected = apt.GetSelected();
+                cmbUser.SelectedIndex = cmbUser.FindString(selected[0]);
+                cmbCust.SelectedIndex = cmbCust.FindString(selected[1]);
+                cmbType.SelectedIndex = cmbType.FindString(selected[2]);
+                dtpStart.Value = DateTime.Parse(selected[3]);
+                cmbStartTime.SelectedIndex = cmbStartTime.FindString(selected[4]);
+                cmbEndTime.SelectedIndex = cmbEndTime.FindString(selected[5]);
+            }
+        }
+        //  Buttons
+        private void ButtonAccept_Click(object sender, EventArgs e)
+        {
+            apt.AType = cmbType.SelectedItem.ToString();                    //  Appointment Type
+            apt.ACustomer = int.Parse(cmbCust.SelectedValue.ToString());    //  Customer Id
+            apt.AUser = int.Parse(cmbUser.SelectedValue.ToString());        //  User Id
+            apt.AStart = dtpStart.Value.Date.ToString();
+            apt.AStartTime = cmbStartTime.SelectedValue.ToString();
+            apt.AEnd = dtpStart.Value.Date.ToString();
+            apt.AEndTime = cmbEndTime.SelectedValue.ToString();
         }
         //  End of class.
     }

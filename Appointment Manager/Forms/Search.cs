@@ -25,9 +25,6 @@ namespace Appointment_Scheduler
 
         private void Search_Load(object sender, EventArgs e)
         {
-            Type = new List<string>();
-            Customer = new DataTable();
-            User = new DataTable();
             //  Loast list of types from data.
             Type = repo.GetTypeList();
             cmbType.DataSource = Type;
@@ -62,12 +59,61 @@ namespace Appointment_Scheduler
             SearchGridView.Columns[2].Visible = false;
             SearchGridView.Columns[4].Visible = false;
         }
-
-        private void ButtonExit_Click(object sender, EventArgs e)
+        //  Events
+        private void CmbUser_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Dispose();
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbUser.SelectedItem is null)))
+            {
+                SetDataFilter();
+            }
         }
-
+        private void CmbCust_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbCust.SelectedItem is null)))
+            {
+                SetDataFilter();
+            }
+        }
+        private void SearchGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            SearchGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+        private void CmbType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if ((!(SearchGridView.DataSource is null)) && (!(cmbType.SelectedItem is null)))
+            {
+                SetDataFilter();
+            }
+        }
+        private void DateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            if (!(SearchGridView.DataSource is null))
+            {
+                SetDataFilter();
+            }
+        }
+        private void DateTimePicker2_ValueChanged(object sender, EventArgs e)
+        {
+            if (!(SearchGridView.DataSource is null))
+            {
+                SetDataFilter();
+            }
+        }
+        private void CmbStartTime_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!(SearchGridView.DataSource is null))
+            {
+                SetDataFilter();
+            }
+        }
+        private void CmbEndTime_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!(SearchGridView.DataSource is null))
+            {
+                SetDataFilter();
+            }
+        }
+        //  Methods
         private DataTable BuildComboTime()
         {
             TimeSpan open = new TimeSpan(08, 00, 00);
@@ -85,62 +131,6 @@ namespace Appointment_Scheduler
                 open = open.Add(increment);
             }
             return dataTable;
-        }
-
-        private void CmbUser_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if ((!(SearchGridView.DataSource is null)) && (!(cmbUser.SelectedItem is null)))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void CmbCust_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if ((!(SearchGridView.DataSource is null)) && (!(cmbCust.SelectedItem is null)))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void CmbType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if ((!(SearchGridView.DataSource is null)) && (!(cmbType.SelectedItem is null)))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void DateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-            if (!(SearchGridView.DataSource is null))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void DateTimePicker2_ValueChanged(object sender, EventArgs e)
-        {
-            if (!(SearchGridView.DataSource is null))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void CmbStartTime_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!(SearchGridView.DataSource is null))
-            {
-                SetDataFilter();
-            }
-        }
-
-        private void CmbEndTime_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!(SearchGridView.DataSource is null))
-            {
-                SetDataFilter();
-            }
         }
         private void SetDataFilter()
         {
@@ -163,11 +153,10 @@ namespace Appointment_Scheduler
                 }
                 finalfilter.Append(s);
             }
-            (SearchGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = finalfilter.ToString();
+            DataTable dataTable = SearchGridView.DataSource as DataTable;
+            dataTable.DefaultView.RowFilter = finalfilter.ToString();
         }
-
+        //  Buttons
         private void ButtonReset_Click(object sender, EventArgs e)
         {
             cmbUser.SelectedIndex = -1;
@@ -177,16 +166,12 @@ namespace Appointment_Scheduler
             dateTimePicker2.Value = dateTimePicker1.MaxDate;
             cmbStartTime.SelectedIndex = 0;
             cmbEndTime.SelectedIndex = cmbEndTime.Items.Count - 1;
-            (SearchGridView.DataSource as DataTable)
-                .DefaultView
-                .RowFilter = string.Empty;
+            DataTable dataTable = SearchGridView.DataSource as DataTable;
+            dataTable.DefaultView.RowFilter = string.Empty;
         }
-
-        private void SearchGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void ButtonExit_Click(object sender, EventArgs e)
         {
-            SearchGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            Dispose();
         }
-
-        //
-    }
+    }// End of class.
 }

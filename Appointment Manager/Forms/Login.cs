@@ -13,10 +13,7 @@ namespace Appointment_Scheduler
             InitializeComponent();
             this.main = main;
             Repo = new Repository();
-            buttonLogin.DialogResult = DialogResult.OK;
-            buttonExit.DialogResult = DialogResult.Cancel;
         }
-
         private void Login_Load(object sender, EventArgs e)
         {
             buttonLogin.Enabled = false;
@@ -39,12 +36,59 @@ namespace Appointment_Scheduler
                 MessageBox.Show("Language not supported: " + CultureInfo.CurrentCulture.Name + "\nPlease change to English (United States), en-US, or Spanish (Mexico), es-MX.", this.Text);
             }
         }
-
-        private void ButtonExit_Click(object sender, EventArgs e)
+        //  Methods
+        public Tuple<bool, string> UserLogin(string user, string pass)
         {
-            main.Dispose();
+            if (Repo.GetUserObject(user) == null)
+            {
+                return _ = Tuple.Create(false, "User");
+            }
+            else
+            {
+                if (Repo.GetUserPassword(user) == pass)
+                {
+                    Repo.SetUser(Repo.GetUserObject(user));
+                    return _ = Tuple.Create(true, "Pass");
+                }
+                else
+                {
+                    return _ = Tuple.Create(false, "Pass");
+                }
+            }
         }
-
+        private bool ValidateText(string name, string data)
+        {
+            switch (name)
+            {
+                case "textUser":
+                    return (data.Length > 0) && (data.Length <= 50);
+                case "textPass":
+                    return (data.Length > 0) && (data.Length <= 50);
+                default:
+                    return false;
+            }
+        }
+        //  Events
+        private void Login_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                main.Dispose();
+            }
+        }
+        private void TextPass_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            bool check = ValidateText(textBox.Name, textBox.Text);
+            if (check)
+            {
+                if ((textUser.Text.Length > 0) && (textPass.Text.Length > 0))
+                {
+                    buttonLogin.Enabled = true;
+                }
+            }
+        }
+        //  Buttons
         private void ButtonLogin_Click(object sender, EventArgs e)
         {
             FileLog log = new FileLog();
@@ -118,73 +162,9 @@ namespace Appointment_Scheduler
                 }
             }
         }
-
-        private void Login_FormClosed(object sender, FormClosedEventArgs e)
+        private void ButtonExit_Click(object sender, EventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                main.Dispose();
-            }
+            main.Dispose();
         }
-
-        private void TextPass_TextChanged(object sender, EventArgs e)
-        {
-            TextBox textBox = (TextBox)sender;
-            bool check = ValidateText(textBox.Name, textBox.Text);
-            if (check)
-            {
-                if ((textUser.Text.Length > 0) && (textPass.Text.Length > 0))
-                {
-                    buttonLogin.Enabled = true;
-                }
-            }
-        }
-
-        public Tuple<bool, string> UserLogin(string user, string pass)
-        {
-            if (Repo.GetUserObject(user) == null)
-            {
-                return _ = Tuple.Create(false, "User");
-            }
-            else
-            {
-                if (Repo.GetUserPassword(user) == pass)
-                {
-                    Repo.SetUser(Repo.GetUserObject(user));
-                    return _ = Tuple.Create(true, "Pass");
-                }
-                else
-                {
-                    return _ = Tuple.Create(false, "Pass");
-                }
-            }
-        }
-        private bool ValidateText (string name, string data)
-        {
-            switch (name)
-            {
-                case "textUser":
-                    if ((data.Length > 0) && (data.Length <= 50))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                case "textPass":
-                    if ((data.Length > 0) && (data.Length <= 50))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                default:
-                    return false;
-            }
-        }
-        //  End of Class
-    }
+    }//  End of Class
 }
