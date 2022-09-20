@@ -45,12 +45,12 @@ namespace Appointment_Scheduler
         #region DataTables
         internal DataTable GetAppointmentTable()
         {
-            var user = Tuple.Create(false,User.UserId);
+            Tuple<bool,int> user = Tuple.Create(false,User.UserId);
             return _dataTables.BuildAppointmentTable(user);
         }
         internal DataTable GetAppointmentTableAll()
         {
-            var user = Tuple.Create(true, 0);
+            Tuple<bool, int> user = Tuple.Create(true, 0);
             return _dataTables.BuildAppointmentTable(user);
         }
         internal DataTable GetCustomerTable()

@@ -29,6 +29,9 @@ namespace Appointment_Scheduler
                 UpdateAppointments(false);
             }
         }
+        /// <summary>
+        /// Checks appointments for logged in user and returns a message if an appointment is in the next 15 minutes.
+        /// </summary>
         private void UserNotifications()
         {
             BindingList<Appointment> appointments = Repo.GetUserAppointments();
@@ -41,6 +44,10 @@ namespace Appointment_Scheduler
                 }
             }
         }
+        /// <summary>
+        /// Generates and data table of appointments for data grid view
+        /// </summary>
+        /// <param name="all">True for all users appointments or false for just the logged in user.</param>
         public void UpdateAppointments(bool all)
         {
             if (all)

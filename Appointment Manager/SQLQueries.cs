@@ -19,7 +19,7 @@ namespace Appointment_Scheduler
         //  Connection Method
         private MySqlConnection CreateAndOpen()
         {
-            var connection = new MySqlConnection(connectionString);
+            MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
             return connection;
         }
@@ -32,7 +32,7 @@ namespace Appointment_Scheduler
             const string contact = "not needed";
             const string url = "not needed";
             const string sqlString = "INSERT INTO appointment VALUES (null,@customer,@user,@title,@desc,@loc,@cont,@type,@url,@start,@end,@time1,@user1,@time2,@user2)";
-            using (var connection = CreateAndOpen())
+            using (MySqlConnection connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -66,7 +66,7 @@ namespace Appointment_Scheduler
         public bool UpdateAppointment(int appointmentId, int customerId, int userId, string type, DateTime start, DateTime end)
         {
             const string sqlString = "UPDATE appointment SET customerId = @customer, userId = @user,type = @type,start = @start,end = @end,lastUpdate = @time2,lastUpdateBy = @user2 WHERE appointmentId = @appointmentId";
-            using (var connection = CreateAndOpen())
+            using (MySqlConnection connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -94,7 +94,7 @@ namespace Appointment_Scheduler
         public bool RemoveAppointment(int appointmentId)
         {
             const string sqlString = "DELETE FROM appointment WHERE appointmentId=@appointmentId";
-            using (var connection = CreateAndOpen())
+            using (MySqlConnection connection = CreateAndOpen())
             {
                 using (MySqlCommand cmd = new MySqlCommand(sqlString, connection))
                 {
@@ -125,7 +125,7 @@ namespace Appointment_Scheduler
                 const string addrString = "INSERT INTO address values (null,@ad1,@ad2,@cityId,@postal,@phone,@time1,@user1,@time2,@user2); SELECT LAST_INSERT_ID();";
                 const string custString = "INSERT INTO customer VALUES (null,@name,@addrId,@bool,@time1,@user1,@time2,@user2); SELECT LAST_INSERT_ID();";
 
-                using (var connection = CreateAndOpen())
+                using (MySqlConnection connection = CreateAndOpen())
                 {
                     MySqlCommand cmd;
                     try
