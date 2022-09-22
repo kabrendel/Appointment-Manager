@@ -91,7 +91,6 @@ namespace Appointment_Scheduler
         //  Buttons
         private void ButtonLogin_Click(object sender, EventArgs e)
         {
-            FileLog log = new FileLog();
             if ((textUser.TextLength == 0) || (textPass.TextLength == 0))
             {
                 if (CultureInfo.CurrentCulture.Name == "es-MX")
@@ -109,7 +108,7 @@ namespace Appointment_Scheduler
             Tuple<bool, string> results = UserLogin(textUser.Text, textPass.Text);
             if (results.Item1)
             {
-                log.Log(true, textUser.Text);
+                FileLog.Log(true, textUser.Text);
                 this.DialogResult = DialogResult.OK;
                 this.Dispose();
             }
@@ -121,13 +120,13 @@ namespace Appointment_Scheduler
                         if (CultureInfo.CurrentCulture.Name == "es-MX")
                         {
                             MessageBox.Show("Error al conectarse a la base de datos.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         else
                         {
                             MessageBox.Show("Error connecting to database.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         break;
@@ -135,13 +134,13 @@ namespace Appointment_Scheduler
                         if (CultureInfo.CurrentCulture.Name == "es-MX")
                         {
                             MessageBox.Show("Nombre de usuario no encontrado en la base de datos.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         else
                         {
                             MessageBox.Show("User name not found in database.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         break;
@@ -149,13 +148,13 @@ namespace Appointment_Scheduler
                         if (CultureInfo.CurrentCulture.Name == "es-MX")
                         {
                             MessageBox.Show("La contraseña no coincide para el usuario.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         else
                         {
                             MessageBox.Show("Password does not match for user.", this.Text);
-                            log.Log(false, textUser.Text);
+                            FileLog.Log(false, textUser.Text);
                             this.DialogResult = DialogResult.None;
                         }
                         break;

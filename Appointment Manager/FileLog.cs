@@ -3,39 +3,32 @@ using System.IO;
 
 namespace Appointment_Scheduler
 {
-    class FileLog
+    internal static class FileLog
     {
         private const string logname = "userlog.txt";
-        public void Log(bool status, string user)
-        {
-            LogExists();
-            DateTime time = DateTime.UtcNow;
-            if (status)
-            {
-                string logMsg = "USER <" + user + "> has logged in at <" + time + ">." ;
-                using (StreamWriter fs = File.AppendText(logname))
-                {
-                    fs.WriteLine(logMsg);
-                }
-            }
-            else
-            {
-                string logMsg = "Failed Login Attempt with USER <" + user + "> at <" + time + ">.";
-                using (StreamWriter fs = File.AppendText(logname))
-                {
-                    fs.WriteLine(logMsg);
-                }
-            }
-        }
-        private void LogExists()
+
+        static FileLog()
         {
             if (!File.Exists(logname))
             {
-                using (StreamWriter fs = File.CreateText(logname))
-                {
-                    fs.WriteLine("Log file for ClientSchedule.  All times logged in UTC.");
-                }
+                WriteLog("Log file for ClientSchedule.  All times logged in UTC.");
             }
+        }
+
+        private static void WriteLog(string message)
+        {
+            var dt = DateTime.UtcNow;
+            using (var sw = File.AppendText(logname))
+            {
+                sw.WriteLine($"[{dt:s}] {message}");
+            }
+        }
+
+        public static void Log(bool status, string user)
+        {
+            WriteLog(status
+                            ? $"Success: USER<{user}> has logged in."
+                            : $"Failure: USER<{user}> has failed to log in.");
         }
     }
 }
